@@ -121,19 +121,28 @@ var PlayListsView = Backbone.View.extend({
 		this.vent = args.vent;
 		this.$textBox = $('#new_playlist_name');
 		this.$playlists = $('#playlists');
-		$(this.el).menu();
+		this.$playlists.sortable({
+			axis: 'y',
+			helper: "clone"
+		});
 		this.render();
 	},
 	
 	events: {
 		'click #add_playlist' : 'showNewPlayListTextBox',
-		'keyup #new_playlist_name' : 'addNewPlayList'
+		'keyup #new_playlist_name' : 'addNewPlayList',
+		'sortupdate #playlists' : 'reorderPlaylists'
 	},
 	
 	render: function() {
 		_.each(playlistsCollection.models, function(playlist){
 			this.appendPlaylistToView(playlist);
 		}.bind(this));
+	},
+	
+	reorderPlaylists: function(e, ui) {
+		var playlistsOrder = $(e.target).sortable('toArray');
+		playlistsCollection.reorderAfterSorting(playlistsOrder);
 	},
 	
 	showNewPlayListTextBox: function(e) {
@@ -173,8 +182,11 @@ var PlayListsView = Backbone.View.extend({
 var PlayListView = Backbone.View.extend({
 	tagName : 'div',
 	
+	className: 'playlistItem',
+	
 	initialize: function(args) {
 		this.vent = args.vent;
+		$(this.el).attr('id', this.model.id);
 		this.model.bind('destroy', this.remove, this);
 		this.$template = _.template($('#playlist_template').html());
 	},
@@ -185,6 +197,7 @@ var PlayListView = Backbone.View.extend({
 	
 	deletePlaylist: function(e){
 		this.model.destroy();
+		playlistsCollection.reorderAfterDelete();
 	},
 	
 	remove: function() {
@@ -221,6 +234,27 @@ var PlayListCollection = Backbone.Collection.extend({
 	getNextOrder : function() {
 		if (this.length == 0) return 1;
 		return this.last().get('order') + 1;
+	},
+	
+	reorderAfterDelete: function() {
+		var order = 1;
+		_.each(this.models, function(playlist){
+			playlist.set('order', order++);
+			playlist.save();
+		}.bind(this));
+	},
+	
+	reorderAfterSorting: function(orderedPlaylistsIds) {
+		var order = 1;
+		_.each(orderedPlaylistsIds, function(id){
+			var playlist = this.get(id);
+			playlist.set('order', order++);
+			playlist.save();
+		}.bind(this));
+	},
+	
+	comparator: function(playlist) {
+		return playlist.get('order');
 	}
 });
 /*
