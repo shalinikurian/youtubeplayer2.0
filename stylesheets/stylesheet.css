@@ -27,9 +27,16 @@ body {
     top: 20px;
 }
 
-#new_playlist_name {
-    display: none;
+#left_nav {
+	position: absolute;
 }
+	#new_playlist_name {
+	    display: none;
+	    position: absolute;
+	    top: 35px;
+	    left: 10px;
+	    width: 105px;
+	}
 
 #container_top{
     position: relative;
@@ -146,4 +153,31 @@ body {
 		padding-bottom: 2px;
 		border-radius : 2px;
 	}
+	
+/*
+ * playlists view
+ */
+#playlists {
+	position: relative;
+	top: 20px;
+	left: 10px;
+	width: 80%;
+	list-style-type: none;
+	color: white;
+}
+	.playlistItem {
+		padding: 5px;
+		font-size: 16px;
+	}
+	
+	.playlistItem:hover {
+		cursor: pointer;
+	}
+			
+		.delete {
+			background: url('../images/delete.png') no-repeat;
+			height: 20px;
+			width: 20px;
+	    }
+
 
