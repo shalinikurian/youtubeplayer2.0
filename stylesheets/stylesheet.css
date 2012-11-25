@@ -12,6 +12,24 @@ body {
     overflow : hidden;
 }
 
+/*
+ * top nav
+ */
+
+#container_top{
+    position: relative;
+    width: 100%;
+    height: 50px;
+    background: rgb(236,236,238); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(236,236,238,1) 0%, rgba(176,176,178,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(236,236,238,1)), color-stop(100%,rgba(176,176,178,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* IE10+ */
+    background: linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ececee', endColorstr='#b0b0b2',GradientType=0 ); /* IE6-9 */
+}
+
 #search_bar {
     width: 163px;
     border: 1px solid #C0C0BA;
@@ -27,6 +45,10 @@ body {
     top: 20px;
 }
 
+/*
+ * left nav
+ */
+
 #left_nav {
 	position: absolute;
 }
@@ -38,19 +60,6 @@ body {
 	    width: 105px;
 	}
 
-#container_top{
-    position: relative;
-    width: 100%;
-    height: 50px;
-    background: rgb(236,236,238); /* Old browsers */
-    background: -moz-linear-gradient(top,  rgba(236,236,238,1) 0%, rgba(176,176,178,1) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(236,236,238,1)), color-stop(100%,rgba(176,176,178,1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* IE10+ */
-    background: linear-gradient(top,  rgba(236,236,238,1) 0%,rgba(176,176,178,1) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ececee', endColorstr='#b0b0b2',GradientType=0 ); /* IE6-9 */
-}
 
 #add_playlist {
     position: relative;
@@ -68,6 +77,10 @@ body {
     background-color: #1C1C1C;
     cursor: pointer;
 }
+
+/*
+ * middle container
+ */
 
 .middle_container {
 	position: fixed;
@@ -157,6 +170,7 @@ body {
 /*
  * playlists view
  */
+
 #playlists {
 	position: relative;
 	top: 20px;
@@ -180,5 +194,56 @@ body {
 			height: 20px;
 			width: 20px;
 	    }
+.song-draggable {
+	border: 1px solid black;
+	background-color: white;
+	opacity: 0.8;
+	z-index: 99;
+	padding: 2px;
+}
+
+#playlist_view {
+	color: white;
+}
+
+.playlist_thumbnail {
+  margin-left: 5px;
+  width: 127px;
+  height: 124px;
+  background-color: transparent;
+  display: inline-block;
+  vertical-align: top;
+  margin-bottom: 10px;
+}
+
+.playlist_individual_thumb {
+	position: relative;
+	top:15px;
+	left: 3px;
+	-webkit-box-shadow: 1px 0px 5px 1px black;
+}
+
+#other_info {
+	display: inline-block;
+	vertical-align: top;
+	width: 550px;
+	background-color: transparent;
+	font-size: 16px;
+	padding: 10px;
+	border-radius: 10px;
+	position: absolute;
+	
+}
+
+#playlist_time {
+	float: right;
+	color: #bdbdbd;
+
+}
+
+#playlist_title {
+	float: left;
+	font-weight: bold;
+}
 
 
