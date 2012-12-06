@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html> 
-    <head>
-        <meta charset='utf-8' />
+  <head>
+    <meta charset='utf-8' />
         <meta http-equiv="X-UA-Compatible" content="chrome=1" />
         <meta name="description" content="Youtubeplayer2.0 : " />
         <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" />
@@ -13,61 +13,70 @@
         <script type="text/javascript" src="javascripts/backbone.localStorage.js"></script>
         <script src="javascripts/main.js"></script>
         <title>Youtubeplayer2.0</title>
-    </head>
-    <body>
-        <!--  search bar  -->
-        <div id = "container_top">
-            <input id = "search_bar" type = "text" placeholder = "Search"/>
+  </head>
+  <body>
+    <!-- search bar -->
+    <div id = "container_top">
+        <input id = "search_bar" type = "text" placeholder = "Search"/>
+    </div>
+    <!-- left nav -->
+    <div id = "left_nav">
+        <div id= "new_playlist_container">
+            <div id = "add_playlist"> New Playlist</div>
+            <input type = "text" id="new_playlist_name"/>
         </div>
-        <!-- left nav -->
-        <div id = "left_nav">
-            <div id= "new_playlist_container">
-                <div id = "add_playlist"> New Playlist</div>
-                <input type = "text" id="new_playlist_name"/>
-            </div>
-            <div id = "playlists">
-            </div>
+        <div id = "playlists">
         </div>
-        <!-- middle container -->
-        <div class = "middle_container" id = "playlist_view"></div>
-        <div class = "middle_container" id = "search_results_view"></div>
-        <!-- youtube player view -->
-        <div id = "video_player_container"></div>
-        <!-- templates -->
-        <!-- search result template -->
-        <script type="text/template" id = "search_result_template">
-			<img class = "thumbnail" src = "<%= thumbnail %>" />
-			<div class="reflection">
-      			<img class="reflection_thumbnail" src = "<%= thumbnail %>"/>
-      			<div class="overlay"></div>
-   			</div>
-   			<div class = "duration"><%= duration %></div>
-			<div class = "title"><%= title %></div>
-		</script>
-		<!-- playlist template -->
-		<script type="text/template" id="playlist_template">
-	    	<div class="name"><%= name %></div>
-	    	<div class = "delete">
-	    	</div>
-		</script>
-		<!--playlist info no songs -->
-		<script type="text/template" id = "playlist_info_template_no_songs">
-			<div class="playlist_thumbnail">
-				<img src = "images/nosongs.png" /></div>
-			</div>
-		</script>
-		<!--playlist info with songs -->
-		<script type="text/template" id = "playlist_info_template">
-			<div class="playlist_thumbnail">
-				<img class = "playlist_individual_thumb" src = "<%= thumbnail1 %>" />
-			</div>
-		</script>
-		<!--playlist general info -->
-		<script type ="text/template" id ="playlist_info_template_general">
-			<div id ="other_info">
-				<div id ="playlist_title"><%=title%></div>
-				<div id ="playlist_time"><%=noOfSongs%> songs, <%=duration%></div>
-			</div>
-		</script>
-    </body>
+    </div>
+    <!-- middle container -->
+    <div class = "middle_container" id = "playlist_view"></div>
+    <div class = "middle_container" id = "search_results_view"></div>
+    <!-- youtube player view -->
+    <div id = "video_player_container"></div>
+    <!-- templates -->
+    <!-- search result template -->
+    <script type="text/template" id = "search_result_template">
+      <img class = "thumbnail" src = "<%= thumbnail %>" />
+      <div class="reflection">
+        <img class="reflection_thumbnail" src = "<%= thumbnail %>"/>
+        <div class="overlay"></div>
+      </div>
+      <div class = "duration"><%= duration %></div>
+      <div class = "title"><%= title %></div>
+    </script>
+    <!-- playlist template -->
+    <script type="text/template" id="playlist_template">
+        <div class="name"><%= name %></div>
+        <div class = "delete">
+        </div>
+    </script>
+    <!--playlist info no songs -->
+    <script type="text/template" id = "playlist_info_template_no_songs">
+      <div class="playlist_thumbnail">
+        <img src = "images/nosongs.png" /></div>
+      </div>
+    </script>
+    <!--playlist info with songs -->
+    <script type="text/template" id = "playlist_info_template">
+      <div class="playlist_thumbnail">
+        <img class = "playlist_individual_thumb" src = "<%= thumbnail1 %>" />
+      </div>
+    </script>
+    <!--playlist general info -->
+    <script type ="text/template" id ="playlist_info_template_general">
+      <div id ="other_info">
+        <div id ="playlist_title"><%=title%></div>
+        <div id ="playlist_time"><%=noOfSongs%> songs, <%=duration%></div>
+      </div>
+    </script>
+    <!-- song list template -->
+    <script type="text/template" id = "songs_list">
+      <table id ="songs">
+        <tr>
+          <th id="track_header">Track</th>
+          <th id="duration_header">Duration</th>
+        </tr>
+      </table>
+    </script>
+  </body>
 </html>
