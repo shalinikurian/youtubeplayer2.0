@@ -236,6 +236,7 @@ var PlayListView = Backbone.View.extend({
     this.model.bind('destroy', this.remove, this);
     this.$template = _.template($('#playlist_template').html());
     $(this.el).droppable({
+      accept: '.search_result_item',
       hoverClass: "ui-state-active",
       drop: function(event, ui){
         var song = $(ui.draggable).data("song-model");
