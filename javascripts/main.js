@@ -300,12 +300,43 @@ var PlayListView = Backbone.View.extend({
       "noOfSongs" : this.model.songs.length , 
       "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
     };
-    this.playlistView.append(generalInfoTemplate(variables));        
+    this.playlistView.append(generalInfoTemplate(variables));
+    //add song list
+    var songListTemplate = _.template($('#songs_list').html());
+    this.playlistView.append(songListTemplate());
+    
+    _.each(this.model.songs.models, function(song){
+      var songView = new SongView({model: song});
+      $("#songs").append(songView.render().el);
+    });
+    
   }
 
 });
 
+var SongView = Backbone.View.extend({
+  tagName: 'tr',
 
+  events: {
+    'click' : 'playSong',
+  },
+  
+  initialize: function() {
+    var evenRow = (this.model.get('order') % 2 == 0 );
+    if (evenRow) $(this.el).addClass('even_row');
+    else $(this.el).addClass('odd_row');
+  },
+  
+  render: function() {
+    var songTemplate = eachSongTemplate = _.template($('#playlist_song').html());
+    var songVariables = {"track": this.model.get('title'), "duration":this.model.get('duration'), "thumbnail": this.model.get('thumbnail')};
+    $(this.el).html(eachSongTemplate(songVariables));
+    return this;
+  },
+  
+  playSong: function(evt) { //TODO
+  }
+});
 /*
  * collections
  */
