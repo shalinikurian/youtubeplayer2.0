@@ -27,13 +27,11 @@ var Playlist = Backbone.Model.extend({
   defaults: {
     name: "New Playlist"
   },
-
   initialize: function() {
     this.songs = new Songs();
     this.songs.setLocalStore(this.id);
     this.songs.fetch();
   },
-
   addSong: function(songToAdd) {
     var song = new Song(songToAdd.toJSON());
     song.set('order', this.songs.getNextOrder());
@@ -78,7 +76,6 @@ var SearchResultsView = Backbone.View.extend({
       this.fetchQueryFromYoutube(query);
     }
   },
-
   // TODO(shalinikurian): We should treat the fetching as a rest API and make it part of the collection, instead of a discreet function.
   fetchQueryFromYoutube: function(query) {
     var youtubeUrl = "https://gdata.youtube.com/feeds/api/videos?q="+query+"&max-results="+this.maxResults+"&v=2&alt=jsonc&callback=?";
@@ -126,7 +123,6 @@ var SearchResultsView = Backbone.View.extend({
     str = str + min.toString() +":"+ secsStr;
     return str;
   }
-
 });
 
 var SearchResultSongView = Backbone.View.extend({
@@ -251,6 +247,7 @@ var PlayListView = Backbone.View.extend({
   'click' : 'playPlaylist'
   },
 
+
   deletePlaylist: function(e){
     this.model.destroy();
     playlistsCollection.reorderAfterDelete();
@@ -288,21 +285,61 @@ var PlayListView = Backbone.View.extend({
     if (noOfSongs == 0 ){
       
     } else {
-      
+
     }
     var playlistTemplate = (noOfSongs == 0) ? (_.template($('#playlist_info_template_no_songs').html())) : (_.template($('#playlist_info_template').html()));
     var variables = (noOfSongs == 0) ? {} : {"thumbnail1": this.model.songs.last().get('thumbnail')};
     this.playlistView.append(playlistTemplate(variables));
+
     //general info
+
     var generalInfoTemplate = _.template($('#playlist_info_template_general').html());
     variables = {
       "title":this.model.get('name'),
       "noOfSongs" : this.model.songs.length , 
       "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
     };
-    this.playlistView.append(generalInfoTemplate(variables));        
+    this.playlistView.append(generalInfoTemplate(variables));
+    //add song list
+    var songListTemplate = _.template($('#songs_list').html());
+    this.playlistView.append(songListTemplate());
+
+    _.each(this.model.songs.models, function(song){
+      var songView = new SongView({
+        model: song
+        });
+        $("#songs").append(songView.render().el);
+      /*$("#songs").append(songView.render(oddRow).el);
+      if (oddRow) oddRow = false;
+        else oddRow = true;*/
+      });
   }
 
+});
+
+var SongView = Backbone.View.extend({
+  tagName: 'tr',
+  
+  events: {
+    'click' : 'playSong'
+  },
+  
+  initialize: function(options) {
+    var evenRow = (this.model.get('order') % 2 == 0);
+    if (evenRow) $(this.el).addClass('even_row');
+    else $(this.el).addClass('odd_row');
+    this.songTemplate = _.template($('#song_in_playlist').html());
+  },
+  
+  render: function() {
+    var songVariables = {"track": this.model.get('title'), "duration":this.model.get('duration'), "thumbnail": this.model.get('thumbnail')};
+    $(this.el).html(this.songTemplate(songVariables));
+    return this;
+  },
+  
+  playSong: function(evt) { //TODO Rajiv
+    
+  }
 });
 
 
@@ -312,7 +349,9 @@ var PlayListView = Backbone.View.extend({
 
 var Songs = Backbone.Collection.extend({
   model : Song,
+
   localStorage: new Store(""),
+
   setLocalStore: function (id) {
     var localKey = "playlist"+id;
     this.localStorage = new Store(localKey); //window needed ?
@@ -322,10 +361,12 @@ var Songs = Backbone.Collection.extend({
     if (this.length == 0) return 1;
     return this.last().get('order') + 1;
   },
+
 });
 
 var PlayListCollection = Backbone.Collection.extend({
   model: Playlist,
+
   localStorage: new Store("playlists"),
 
   getNextOrder : function() {
@@ -362,6 +403,7 @@ function appInit() {
   window.playlistsCollection = new PlayListCollection;
   playlistsCollection.fetch();
   window.playListsView = new PlayListsView({vent: vent});
+
 }
 
 $(document).ready(function() {
