@@ -88,10 +88,12 @@ var SearchResultsView = Backbone.View.extend({
   },
 
   populateSearchResults: function(data) {
-      this.$searchResultsContainer.html('');
-      $.each(data.data.items, function(index, song){
-        this.addSong(song);
-      }.bind(this));
+    $('#playlist_view').hide();
+    this.$searchResultsContainer.html('');
+    this.$searchResultsContainer.show();
+    $.each(data.data.items, function(index, song){
+      this.addSong(song);
+    }.bind(this));
   },
 
   addSong: function(songItem) {
