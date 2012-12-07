@@ -1,6 +1,8 @@
 //events
 var vent = _.extend({} , Backbone.Events);
 
+var YoutubePlayer = {};
+
 var durationForDisplay = function(secs){
   var hrs = Math.floor(secs/3600);
   var rem = secs % 3600;
