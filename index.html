@@ -36,38 +36,52 @@
         <!-- templates -->
         <!-- search result template -->
         <script type="text/template" id = "search_result_template">
-      <img class = "thumbnail" src = "<%= thumbnail %>" />
-      <div class="reflection">
-            <img class="reflection_thumbnail" src = "<%= thumbnail %>"/>
-            <div class="overlay"></div>
-         </div>
-         <div class = "duration"><%= duration %></div>
-      <div class = "title"><%= title %></div>
-    </script>
-    <!-- playlist template -->
-    <script type="text/template" id="playlist_template">
-        <div class="name"><%= name %></div>
-        <div class = "delete">
-        </div>
-    </script>
-    <!--playlist info no songs -->
-    <script type="text/template" id = "playlist_info_template_no_songs">
-      <div class="playlist_thumbnail">
-        <img src = "images/nosongs.png" /></div>
-      </div>
-    </script>
-    <!--playlist info with songs -->
-    <script type="text/template" id = "playlist_info_template">
-      <div class="playlist_thumbnail">
-        <img class = "playlist_individual_thumb" src = "<%= thumbnail1 %>" />
-      </div>
-    </script>
-    <!--playlist general info -->
-    <script type ="text/template" id ="playlist_info_template_general">
-      <div id ="other_info">
-        <div id ="playlist_title"><%=title%></div>
-        <div id ="playlist_time"><%=noOfSongs%> songs, <%=duration%></div>
-      </div>
-    </script>
+          <img class = "thumbnail" src = "<%= thumbnail %>" />
+          <div class="reflection">
+                <img class="reflection_thumbnail" src = "<%= thumbnail %>"/>
+                <div class="overlay"></div>
+             </div>
+             <div class = "duration"><%= duration %></div>
+          <div class = "title"><%= title %></div>
+        </script>
+        <!-- playlist template -->
+        <script type="text/template" id="playlist_template">
+          <div class="name"><%= name %></div>
+          <div class = "delete">
+          </div>
+        </script>
+        <!--playlist info no songs -->
+        <script type="text/template" id = "playlist_info_template_no_songs">
+          <div class="playlist_thumbnail">
+            <img src = "images/nosongs.png" /></div>
+          </div>
+        </script>
+        <!--playlist info with songs -->
+        <script type="text/template" id = "playlist_info_template">
+          <div class="playlist_thumbnail">
+            <img class = "playlist_individual_thumb" src = "<%= thumbnail1 %>" />
+          </div>
+        </script>
+        <!--playlist general info -->
+        <script type ="text/template" id ="playlist_info_template_general">
+          <div id ="other_info">
+            <div id ="playlist_title"><%=title%></div>
+            <div id ="playlist_time"><%=noOfSongs%> songs, <%=duration%></div>
+          </div>
+        </script>
+        <!-- song in playlist -->
+        <script type = "text/template" id = "playlist_song">
+          <td><img  class="small_thumb" src = "<%= thumbnail %>" /> <%=track%></td>
+          <td><%=duration%></td>
+        </script>
+        <!-- song list -->
+        <script type="text/template" id = "songs_list">
+          <table id ="songs">
+            <tr>
+              <th id="track_header">Track</th>
+              <th id="duration_header">Duration</th>
+            </tr>
+          </table>
+        </script>
     </body>
 </html>
