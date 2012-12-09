@@ -288,15 +288,6 @@ body {
   background-color: #313131;
 }
 /* video player */
-<<<<<<< HEAD
-
-#video_player_container {
-  position : fixed;
-  left: 790px;
-  top: 150px;
-}
-=======
->>>>>>> master
 
 #video_player_container {
   position : fixed;
