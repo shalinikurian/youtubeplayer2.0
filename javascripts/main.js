@@ -349,9 +349,9 @@ var PlayListView = Backbone.View.extend({
     this.playlistView.html('').show();
     var noOfSongs = this.model.songs.length;
     if (noOfSongs == 0 ){
-      
+
     } else {
-      
+
     }
     var playlistTemplate = (noOfSongs == 0) ? (_.template($('#playlist_info_template_no_songs').html())) : (_.template($('#playlist_info_template').html()));
     var variables = (noOfSongs == 0) ? {} : {"thumbnail1": this.model.songs.last().get('thumbnail')};
@@ -360,19 +360,19 @@ var PlayListView = Backbone.View.extend({
     var generalInfoTemplate = _.template($('#playlist_info_template_general').html());
     variables = {
       "title":this.model.get('name'),
-      "noOfSongs" : this.model.songs.length , 
+      "noOfSongs" : this.model.songs.length ,
       "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
     };
     this.playlistView.append(generalInfoTemplate(variables));
     //add song list
     var songListTemplate = _.template($('#songs_list').html());
     this.playlistView.append(songListTemplate());
-    
+
     _.each(this.model.songs.models, function(song){
       var songView = new SongView({model: song});
       $("#songs").append(songView.render().el);
     });
-    
+
   }
 
 });
@@ -383,20 +383,20 @@ var SongView = Backbone.View.extend({
   events: {
     'click' : 'playSong',
   },
-  
+
   initialize: function() {
     var evenRow = (this.model.get('order') % 2 == 0 );
     if (evenRow) $(this.el).addClass('even_row');
     else $(this.el).addClass('odd_row');
   },
-  
+
   render: function() {
     var songTemplate = eachSongTemplate = _.template($('#playlist_song').html());
     var songVariables = {"track": this.model.get('title'), "duration":this.model.get('duration'), "thumbnail": this.model.get('thumbnail')};
     $(this.el).html(eachSongTemplate(songVariables));
     return this;
   },
-  
+
   playSong: function(evt) { //TODO
   }
 });
