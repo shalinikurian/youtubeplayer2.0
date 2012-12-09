@@ -6,7 +6,7 @@ var YoutubePlayerView = Backbone.View.extend({
     this.apiReady = false;
     this.panelShowing = 0;
     this.vent = options.vent;
-    _.bindAll(this, 'youTubePlayerAPIReady', 'playSong');
+    _.bindAll(this, 'youTubePlayerAPIReady', 'playSong', 'playerReady', 'stateChanged', 'videoEnded', 'apiError');
 
     //Add youtube script
     options.vent.bind("YouTubePlayerAPIReady", this.youTubePlayerAPIReady);
