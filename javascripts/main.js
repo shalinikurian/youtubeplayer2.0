@@ -1,7 +1,72 @@
 //events
 var vent = _.extend({} , Backbone.Events);
 
-var YoutubePlayer = {};
+var YoutubePlayerView = Backbone.View.extend({
+  initialize: function(options) {
+    this.apiReady = false;
+    this.panelShowing = 0;
+    this.vent = options.vent;
+    _.bindAll(this, 'youTubePlayerAPIReady', 'playSong');
+
+    //Add youtube script
+    options.vent.bind("YouTubePlayerAPIReady", this.youTubePlayerAPIReady);
+    var tag = document.createElement('script');
+    tag.src = "http://www.youtube.com/player_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  },
+
+    youTubePlayerAPIReady : function() {
+      alert(this.apiReady);
+      this.apiReady = true;
+      alert(this.apiReady);
+    },
+
+
+    playSong: function(song) {
+      alert(this.apiReady);
+      if (this.apiReady) {
+        var songUrl = song.get("song_id");
+        if (this.player) {
+          this.player.loadVideoById(songUrl)
+        } else {  // Load a player and set it to play the song.
+          this.player = new YT.player('video_player_container', {
+            width: 640,
+            height: 480,
+            videoId: songUrl,
+            events: {
+              'onReady': this.playerReady,
+              'onPlaybackQualityChange': this.playerReady,
+              'onStateChange': this.stateChanged,
+              'onError': this.apiError
+            }
+          });
+        }
+      } else {
+        alert("Youtube api not ready please reload the page.");
+      }
+    },
+
+    playerReady: function(event) {
+       this.player.playVideo();
+    },
+
+    stateChanged: function(event) {
+      if (event.data == YT.PlayerState.ENDED) {
+        console.log("video ended")
+        this.videoEnded()
+      }
+    },
+
+    videoEnded: function() {
+      // Let other parties know that a video ended.
+      console.log("video ended")
+    },
+
+    apiError: function(error) {
+      alert("Error is " + error)
+    }
+  });
 
 var durationForDisplay = function(secs){
   var hrs = Math.floor(secs/3600);
@@ -19,6 +84,7 @@ var durationForDisplay = function(secs){
   str = str + min.toString() + " m "+ secsStr + " s ";
   return str;
 }
+
 /*
  * Models
  */
@@ -160,6 +226,7 @@ var SearchResultSongView = Backbone.View.extend({
 
   // TODO(rajivkurian): Implement this.
   playSong: function() {
+    YoutubePlayer.playSong(this.model)
   }
 });
 
@@ -389,6 +456,10 @@ var PlayListCollection = Backbone.Collection.extend({
     return playlist.get('order');
   }
 });
+
+  function onYouTubePlayerAPIReady() {
+    vent.trigger("YouTubePlayerAPIReady");
+  }
 /*
  * Initialize the application
  */
@@ -397,6 +468,7 @@ function appInit() {
   window.playlistsCollection = new PlayListCollection;
   playlistsCollection.fetch();
   window.playListsView = new PlayListsView({vent: vent});
+  window.YoutubePlayer = new YoutubePlayerView({vent: vent})
 }
 
 $(document).ready(function() {
