@@ -84,10 +84,10 @@ body {
 
 .middle_container {
     position: fixed;
-    left:200px;
+    left:250px;
     bottom: 0px;
     top : 45px;
-    width: 500px;
+    width: 700px;
     background-color: #373737;
     margin-left: 5px;
     margin-top: 5px;
@@ -287,6 +287,7 @@ body {
 .even_row {
   background-color: #313131;
 }
+
 /* video player */
 
 #video_player_container {
