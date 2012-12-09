@@ -287,4 +287,11 @@ body {
 .even_row {
   background-color: #313131;
 }
+/* video player */
+
+#video_player_container {
+  position : fixed;
+  left: 1000px;
+  top: 150px;
+}
 

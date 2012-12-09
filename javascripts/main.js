@@ -16,38 +16,32 @@ var YoutubePlayerView = Backbone.View.extend({
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   },
 
-    youTubePlayerAPIReady : function() {
-      alert(this.apiReady);
-      this.apiReady = true;
-      alert(this.apiReady);
-    },
+  youTubePlayerAPIReady : function() {
+  this.apiReady = true;
+  },
 
 
-    playSong: function(song) {
-      alert(this.apiReady);
-      if (this.apiReady) {
-        var songUrl = song.get("song_id");
-        if (this.player) {
-          this.player.loadVideoById(songUrl)
-        } else {  // Load a player and set it to play the song.
-          this.player = new YT.player('video_player_container', {
-            width: 640,
-            height: 480,
-            videoId: songUrl,
-            events: {
-              'onReady': this.playerReady,
-              'onPlaybackQualityChange': this.playerReady,
-              'onStateChange': this.stateChanged,
-              'onError': this.apiError
-            }
-          });
-        }
-      } else {
-        alert("Youtube api not ready please reload the page.");
-      }
-    },
+  playSong: function(song) {
+   if (this.apiReady) {
+      var songUrl = song.get("song_id");
+      if (this.player) {
+        this.player.loadVideoById(songUrl)
+      } else this.player = new YT.Player('video_player_container', {
+          width: 640,
+          height: 480,
+          videoId: songUrl,
+          events: {
+            'onReady': this.playerReady,
+            'onPlaybackQualityChange': this.playerReady,
+            'onStateChange': this.stateChanged,
+            'onError': this.errorz
+          }
+        });
+      } else alert("api not ready");
+  },
 
     playerReady: function(event) {
+      console.log("In playerReady function ready to play")
        this.player.playVideo();
     },
 
