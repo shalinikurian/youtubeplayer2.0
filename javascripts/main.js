@@ -27,8 +27,8 @@ var YoutubePlayerView = Backbone.View.extend({
       if (this.player) {
         this.player.loadVideoById(songUrl)
       } else this.player = new YT.Player('video_player_container', {
-          width: 640,
-          height: 480,
+          width: 400,
+          height: 280,
           videoId: songUrl,
           events: {
             'onReady': this.playerReady,
