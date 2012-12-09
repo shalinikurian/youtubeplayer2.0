@@ -110,19 +110,19 @@ body {
         color: white;
         text-align: center;
     }
-    
+
     .thumbnail {
         position: relative;
         left: 50px;
         width: 120px;
         height: 90px;
-    
+
     }
-    
+
     .thumbnail:hover {
         cursor: pointer;
     }
-    
+
     .reflection {
         position: relative;
         left: 50px;
@@ -144,15 +144,15 @@ body {
         filter: flipv; opacity:0.20;
         filter: alpha(opacity='20');
     }
-    
-    .overlay { 
+
+    .overlay {
         position:absolute; top:0px; left:0px; width:120px; height:90px;
         background-image:     -webkit-gradient( linear, left bottom, left top, color-stop(0.60, rgb(55,55,55)), color-stop(0.75, rgba(46,46,46,0)));
         background-image: -moz-linear-gradient( center bottom, rgb(55,55,55) 60%, rgba(46,46,46,0) 75%);
         background-image:   -o-linear-gradient( rgba(46,46,46,0) 25%, rgb(55,55,55) 40%);
         background-image:     -webkit-gradient( linear, left bottom, left top, color-stop(0.60, rgb(55,55,55)), color-stop(0.75, rgba(46,46,46,0)));
     }
-    
+
     .duration {
         position: relative;
         display: inline-block;
@@ -166,7 +166,7 @@ body {
         padding-bottom: 2px;
         border-radius : 2px;
     }
-    
+
 /*
  * playlists view
  */
@@ -184,11 +184,11 @@ body {
         padding: 5px;
         font-size: 16px;
     }
-    
+
     .playlistItem:hover {
         cursor: pointer;
     }
-            
+
         .delete {
             background: url('../images/delete.png') no-repeat;
             height: 20px;
@@ -232,7 +232,7 @@ body {
     padding: 10px;
     border-radius: 10px;
     position: absolute;
-    
+
 }
 
 #playlist_time {
@@ -247,7 +247,7 @@ body {
 }
 
 /*
-* song list 
+* song list
 */
 #songs {
   padding-top: 10px;
@@ -272,7 +272,7 @@ body {
 }
 
 /*
- * song view 
+ * song view
  */
 
 .small_thumb {
@@ -288,10 +288,18 @@ body {
   background-color: #313131;
 }
 /* video player */
+<<<<<<< HEAD
 
 #video_player_container {
   position : fixed;
   left: 790px;
   top: 150px;
 }
+=======
+>>>>>>> master
 
+#video_player_container {
+  position : fixed;
+  left: 790px;
+  top: 150px;
+}
