@@ -20,7 +20,6 @@ var YoutubePlayerView = Backbone.View.extend({
   this.apiReady = true;
   },
 
-
   playSong: function(song) {
    if (this.apiReady) {
       var songUrl = song.get("song_id");
@@ -47,7 +46,6 @@ var YoutubePlayerView = Backbone.View.extend({
 
     stateChanged: function(event) {
       if (event.data == YT.PlayerState.ENDED) {
-        console.log("video ended")
         this.videoEnded()
       }
     },
