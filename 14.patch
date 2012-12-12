@@ -1,0 +1,343 @@
+From bcef99be0539a6214c7c4cfd3cc393ed4aa68458 Mon Sep 17 00:00:00 2001
+From: Shalini <shalinikurian@gmail.com>
+Date: Tue, 11 Dec 2012 21:55:02 -0800
+Subject: [PATCH] delete song and comment other functions
+
+---
+ index.html          |    5 +-
+ javascripts/main.js |  130 ++++++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 118 insertions(+), 17 deletions(-)
+
+diff --git a/index.html b/index.html
+index 5249cfb..87bb816 100644
+--- a/index.html
++++ b/index.html
+@@ -71,7 +71,10 @@
+         </script>
+         <!-- song in playlist -->
+         <script type = "text/template" id = "playlist_song">
+-          <td><img  class="small_thumb" src = "<%= thumbnail %>" /> <%=track%></td>
++          <td>
++            <img  class="small_thumb" src = "<%= thumbnail %>" /> <%=track%>
++            <div class="delete"/>
++          </td>
+           <td><%=duration%></td>
+         </script>
+         <!-- song list -->
+diff --git a/javascripts/main.js b/javascripts/main.js
+index 665bfbe..6cfac8e 100644
+--- a/javascripts/main.js
++++ b/javascripts/main.js
+@@ -1,6 +1,9 @@
+ //events
+ var vent = _.extend({} , Backbone.Events);
+ 
++/*
++ * pretty print duration for display
++ */
+ var durationForDisplay = function(secs){
+   var hrs = Math.floor(secs/3600);
+   var rem = secs % 3600;
+@@ -21,27 +24,49 @@ var durationForDisplay = function(secs){
+  * Models
+  */
+ 
++/*
++ * song model used for both search result song item and playlist song item
++ */
+ var Song = Backbone.Model.extend({});
+ 
++/*
++ * playlist model
++ */
++
+ var Playlist = Backbone.Model.extend({
+   defaults: {
+     name: "New Playlist"
+   },
+ 
++  /*
++   * make new song collection and fetch songs in playlist from local store
++   */
++
+   initialize: function() {
+     this.songs = new Songs();
+     this.songs.setLocalStore(this.id);
+     this.songs.fetch();
+   },
+ 
++  /*
++   * add song to playlist
++   */
++
+   addSong: function(songToAdd) {
+-    var song = new Song(songToAdd.toJSON());
+-    song.set('order', this.songs.getNextOrder());
++    var song = new Song(songToAdd.toJSON());  //make new song model
++    song.set('order', this.songs.getNextOrder()); //set order of new song 
+     // Do we need to add playlist no?
+-    this.songs.create(song);
++    /*
++     * add song to songs collection
++     */
++    this.songs.create(song); 
+     this.songs.last().save();
+     },
+ 
++  /*
++   * calculate and store duration for pretty print 
++   */
++
+   playlistDuration: function() {
+     var totalDuration = 0;
+     _.each(this.songs.models, function(song){
+@@ -56,6 +81,10 @@ var Playlist = Backbone.Model.extend({
+  */
+ 
+ var SearchResultsView = Backbone.View.extend({
++  /*
++   * set max results for search view and clear search bar
++   */
++
+   initialize: function(args) {
+     this.$searchBar = $('#search_bar');
+     this.$searchResultsContainer = $('#search_results_view');
+@@ -87,6 +116,9 @@ var SearchResultsView = Backbone.View.extend({
+     }.bind(this));
+   },
+ 
++  /*
++   * hide playlist view, add songs from search results to view
++   */
+   populateSearchResults: function(data) {
+     $('#playlist_view').hide();
+     this.$searchResultsContainer.html('');
+@@ -96,6 +128,9 @@ var SearchResultsView = Backbone.View.extend({
+     }.bind(this));
+   },
+ 
++  /*
++   * make song model. make search result song view and append to search results
++   */
+   addSong: function(songItem) {
+     var song = new Song({
+       'title' : songItem.title,
+@@ -112,6 +147,9 @@ var SearchResultsView = Backbone.View.extend({
+     this.$searchResultsContainer.append(searchResultSongView.render().el);
+   },
+ 
++  /*
++   * pretty print duration for search result item
++   */
+   durationForDisplay: function(secs){
+     var hrs = Math.floor(secs/3600);
+     var rem = secs % 3600;
+@@ -131,7 +169,13 @@ var SearchResultsView = Backbone.View.extend({
+ 
+ });
+ 
++/*
++ * search result song view
++ */
+ var SearchResultSongView = Backbone.View.extend({
++  /*
++   * make search results draggable and initialize view with search result template
++   */
+   initialize: function() {
+     this.$searchResultItem = $(this.el);
+     this.$searchResultItem.addClass('search_result_item');
+@@ -161,9 +205,15 @@ var SearchResultSongView = Backbone.View.extend({
+   }
+ });
+ 
++/*
++ * playlist view on left nav
++ */
+ var PlayListsView = Backbone.View.extend({
+   el : '#left_nav',
+ 
++  /*
++   * make playlist sortable and render view
++   */
+   initialize: function(args){
+     this.vent = args.vent;
+     this.$textBox = $('#new_playlist_name');
+@@ -187,17 +237,26 @@ var PlayListsView = Backbone.View.extend({
+     }.bind(this));
+   },
+ 
++  /*
++   * reorder playlist order for sortable
++   */
+   reorderPlaylists: function(e, ui) {
+    var playlistsOrder = $(e.target).sortable('toArray');
+    playlistsCollection.reorderAfterSorting(playlistsOrder);
+   },
+ 
++  /*
++   * display new playlist text box //TODO consider replacing the new playlist button with the text button spotify style
++   */
+   showNewPlayListTextBox: function(e) {
+     this.$textBox.val('');
+     this.$textBox.slideDown('fast', function(){});
+     this.$textBox.focus();
+   },
+ 
++  /*
++   * add new playlist to collection of playlists and add to playlist view
++   */
+   addNewPlayList: function(e) {
+     if (e.which == 27) {
+       this.$textBox.slideUp('fast', function(){});
+@@ -216,6 +275,9 @@ var PlayListsView = Backbone.View.extend({
+     }
+   },
+ 
++  /*
++   * add playlist to playlists view
++   */
+   appendPlaylistToView: function(playlist) {
+     var playlistView = new PlayListView({
+       model: playlist,
+@@ -226,11 +288,17 @@ var PlayListsView = Backbone.View.extend({
+   }
+ });
+ 
++/*
++ * single playlist view
++ */
+ var PlayListView = Backbone.View.extend({
+   tagName : 'div',
+ 
+   className: 'playlistItem',
+ 
++  /*
++   * make playlist item droppable
++   */
+   initialize: function(args) {
+     this.vent = args.vent;
+     this.playlistView = $('#playlist_view');
+@@ -253,7 +321,11 @@ var PlayListView = Backbone.View.extend({
+   'click' : 'playPlaylist'
+   },
+ 
++  /*
++   * delete playlist , unbind events and remove view, reorder playlists after delete
++   */
+   deletePlaylist: function(e){
++    this.unbind();
+     this.model.destroy();
+     playlistsCollection.reorderAfterDelete();
+   },
+@@ -262,21 +334,14 @@ var PlayListView = Backbone.View.extend({
+     $(this.el).remove();
+   },
+ 
+-  showOptions: function(e) {
+-    var $target = $(e.target);
+-    $(this.el).find('.options').show();
+-  },
+-
+-  hideOptions: function(e) {
+-    var $target = $(e.target);
+-    $(this.el).find('.options').hide();
+-  },
+-
+   render: function() {
+     $(this.el).html(this.$template(this.model.toJSON()));
+     return this;
+   },
+ 
++  /*
++   * show playlist view in middle nav //TODO add auto play ?
++   */
+   playPlaylist: function() {
+     //hide search results
+     $('#search_results_view').hide();
+@@ -284,6 +349,10 @@ var PlayListView = Backbone.View.extend({
+     this.showPlayList();
+   },
+ 
++  /*
++   * get templates for playlist information. render views.
++   */
++
+   showPlayList: function() {
+     this.playlistView.html('').show();
+     var noOfSongs = this.model.songs.length;
+@@ -308,22 +377,31 @@ var PlayListView = Backbone.View.extend({
+     this.playlistView.append(songListTemplate());
+     
+     _.each(this.model.songs.models, function(song){
+-      var songView = new SongView({model: song});
++      var songView = new SongView({model: song, songCollection: this.model.songs});
+       $("#songs").append(songView.render().el);
+-    });
++    }.bind(this));
+     
+   }
+ 
+ });
+ 
++/*
++ * song view
++ */
++
+ var SongView = Backbone.View.extend({
+   tagName: 'tr',
+ 
+   events: {
+     'click' : 'playSong',
++    'click .delete' : 'deleteSong'
+   },
+   
+-  initialize: function() {
++  /*
++   * initialize with information of song collection and row 
++   */
++  initialize: function(options) {
++    this.songCollection = options.songCollection;
+     var evenRow = (this.model.get('order') % 2 == 0 );
+     if (evenRow) $(this.el).addClass('even_row');
+     else $(this.el).addClass('odd_row');
+@@ -336,6 +414,17 @@ var SongView = Backbone.View.extend({
+     return this;
+   },
+   
++  /*
++   * on delete song , unbind event , remove view and reorder playlist song collection order
++   */
++  deleteSong: function(evt) {
++    this.remove();
++    this.unbind();
++    //reorder songs after delete
++    this.model.destroy();
++    this.songCollection.reorderAfterDelete();
++  },
++  
+   playSong: function(evt) { //TODO
+   }
+ });
+@@ -351,10 +440,19 @@ var Songs = Backbone.Collection.extend({
+     this.localStorage = new Store(localKey); //window needed ?
+   },
+ 
++  
+   getNextOrder : function() {
+     if (this.length == 0) return 1;
+     return this.last().get('order') + 1;
+   },
++  
++  reorderAfterDelete: function() {
++    var order = 1;
++    _.each(this.models, function(song){
++      song.set('order', order++);
++      song.save();
++    }.bind(this));
++  }
+ });
+ 
+ var PlayListCollection = Backbone.Collection.extend({
+-- 
+1.7.10
+
