@@ -16,7 +16,7 @@ body {
  * top nav
  */
 
-#container_top, #songs th{
+#container_top, #songs_header{
     position: relative;
     width: 100%;
     height: 50px;
@@ -255,15 +255,16 @@ body {
   width: 700px;
   border-collapse: collapse;
 }
-#songs th {
+#songs_header {
   background-color: #a4a4a4;
   color: black;
-  height: 10px;
+  height: 30px;
 }
 
-#songs tr {
-  color: #bdbdbd;
+.songs_header_elem {
+  float: left;
 }
+
 #track_header {
   width: 80%;
 }

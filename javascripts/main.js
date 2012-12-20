@@ -9,7 +9,7 @@ var YoutubePlayerView = Backbone.View.extend({
     _.bindAll(this, 'youTubePlayerAPIReady', 'playSong', 'playerReady', 'stateChanged', 'videoEnded', 'apiError');
 
     // Add Youtube script.
-    options.vent.bind("YouTubePlayerAPIReady", this.youTubePlayerAPIReady);
+    this.vent.bind("YouTubePlayerAPIReady", this.youTubePlayerAPIReady);
     var tag = document.createElement('script');
     tag.src = "http://www.youtube.com/player_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -104,8 +104,10 @@ var Playlist = Backbone.Model.extend({
 
   initialize: function() {
     this.songs = new Songs();
-    this.songs.setLocalStore(this.id);
-    this.songs.fetch();
+    if (this.id) {
+      this.songs.setLocalStore(this.id);
+      this.songs.fetch();
+    }
   },
 
   /*
@@ -277,6 +279,9 @@ var PlayListsView = Backbone.View.extend({
    */
   initialize: function(args){
     this.vent = args.vent;
+    _.bindAll(this, 'setCurrentPlayingPlaylist');
+    this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
+    
     this.$textBox = $('#new_playlist_name');
     this.$playlists = $('#playlists');
     this.$playlists.sortable({
@@ -292,6 +297,12 @@ var PlayListsView = Backbone.View.extend({
     'sortupdate #playlists' : 'reorderPlaylists'
   },
 
+  setCurrentPlayingPlaylist: function(currentPlaylistId) {
+    _.each(playlistsCollection.models, function(playlist){
+      playlist.currentPlayingPlaylist = (playlist.get('id') == currentPlaylistId) ? true : false;
+    });
+  },
+  
   render: function() {
     _.each(playlistsCollection.models, function(playlist){
       this.appendPlaylistToView(playlist);
@@ -417,7 +428,7 @@ var PlayListView = Backbone.View.extend({
    * show playlist view in middle nav //TODO add auto play ?
    */
   playPlaylist: function() {
-    this.currentPlayingPlaylist = true;
+    this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
     //hide search results
     $('#search_results_view').hide();
     //show playlist view
@@ -469,7 +480,6 @@ var PlayListView = Backbone.View.extend({
  */
 
 var SongView = Backbone.View.extend({
-  tagName: 'tr',
 
   events: {
     'click' : 'playSong',
