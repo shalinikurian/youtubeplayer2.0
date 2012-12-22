@@ -279,9 +279,6 @@ var PlayListsView = Backbone.View.extend({
    */
   initialize: function(args){
     this.vent = args.vent;
-    _.bindAll(this, 'setCurrentPlayingPlaylist');
-    this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
-    
     this.$textBox = $('#new_playlist_name');
     this.$playlists = $('#playlists');
     this.$playlists.sortable({
@@ -297,12 +294,6 @@ var PlayListsView = Backbone.View.extend({
     'sortupdate #playlists' : 'reorderPlaylists'
   },
 
-  setCurrentPlayingPlaylist: function(currentPlaylistId) {
-    _.each(playlistsCollection.models, function(playlist){
-      playlist.currentPlayingPlaylist = (playlist.get('id') == currentPlaylistId) ? true : false;
-    });
-  },
-  
   render: function() {
     _.each(playlistsCollection.models, function(playlist){
       this.appendPlaylistToView(playlist);
@@ -374,7 +365,10 @@ var PlayListView = Backbone.View.extend({
   initialize: function(args) {
     this.vent = args.vent;
     this.currentPlayingPlaylist = false;
-    _.bindAll(this, 'songDeleted', 'remove');
+
+    _.bindAll(this, 'songDeleted', 'remove', 'setCurrentPlayingPlaylist');
+    
+    this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
     this.vent.bind("songDeleted", this.songDeleted);
     this.model.bind('destroy', this.remove);
     
@@ -424,6 +418,17 @@ var PlayListView = Backbone.View.extend({
     return this;
   },
 
+  /*
+   * set currentPlayingPlaylist to false
+   */
+  setCurrentPlayingPlaylist: function(isCurrentlyPlaying) {
+    this.currentPlayingPlaylist = isCurrentlyPlaying;
+  },
+  
+  setCurrentPlayingPlaylist: function(currentPlaylistId) {
+    this.currentPlayingPlaylist = (currentPlaylistId == this.model.get('id'))
+  },
+  
   /*
    * show playlist view in middle nav //TODO add auto play ?
    */
