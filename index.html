@@ -71,19 +71,19 @@
         </script>
         <!-- song in playlist -->
         <script type = "text/template" id = "playlist_song">
-          <td>
+          <div>
             <img  class="small_thumb" src = "<%= thumbnail %>" /> <%=track%>
             <div class="delete"/>
-          </td>
+          </div>
         </script>
         <!-- song list -->
         <script type="text/template" id = "songs_list">
-          <table id ="songs">
-            <tr>
-              <th id="track_header">Track</th>
-              <th id="duration_header">Duration</th>
-            </tr>
-          </table>
+          <div id="songs_header">
+            <div id="track_header" class="songs_header_elem">Track</div>
+            <div id="duration_header" class="songs_header_elem">Duration</div>
+          </div>
+          <div id ="songs">
+          </div>
         </script>
     </body>
 </html>

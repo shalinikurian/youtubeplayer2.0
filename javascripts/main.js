@@ -9,7 +9,7 @@ var YoutubePlayerView = Backbone.View.extend({
     _.bindAll(this, 'youTubePlayerAPIReady', 'playSong', 'playerReady', 'stateChanged', 'videoEnded', 'apiError');
 
     // Add Youtube script.
-    options.vent.bind("YouTubePlayerAPIReady", this.youTubePlayerAPIReady);
+    this.vent.bind("YouTubePlayerAPIReady", this.youTubePlayerAPIReady);
     var tag = document.createElement('script');
     tag.src = "http://www.youtube.com/player_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -104,8 +104,10 @@ var Playlist = Backbone.Model.extend({
 
   initialize: function() {
     this.songs = new Songs();
-    this.songs.setLocalStore(this.id);
-    this.songs.fetch();
+    if (this.id) {
+      this.songs.setLocalStore(this.id);
+      this.songs.fetch();
+    }
   },
 
   /*
@@ -362,10 +364,19 @@ var PlayListView = Backbone.View.extend({
    */
   initialize: function(args) {
     this.vent = args.vent;
+    this.currentPlayingPlaylist = false;
+
+    _.bindAll(this, 'songDeleted', 'remove', 'setCurrentPlayingPlaylist');
+    
+    this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
+    this.vent.bind("songDeleted", this.songDeleted);
+    this.model.bind('destroy', this.remove);
+    
     this.playlistView = $('#playlist_view');
     $(this.el).attr('id', this.model.id);
-    this.model.bind('destroy', this.remove, this);
+    
     this.$template = _.template($('#playlist_template').html());
+    
     $(this.el).droppable({
       accept: '.search_result_item',
       hoverClass: "ui-state-active",
@@ -375,13 +386,20 @@ var PlayListView = Backbone.View.extend({
         ui.helper.hide();
       }.bind(this)
     });
-  },
 
+  },
+  
+  songDeleted: function() {
+    if (this.currentPlayingPlaylist) {
+      this.model.songs.reorderAfterDelete();
+    }
+  },
+  
+    
   events: {
   'click .delete' : 'deletePlaylist',
   'click' : 'playPlaylist'
   },
-
   /*
    * delete playlist , unbind events and remove view, reorder playlists after delete
    */
@@ -401,9 +419,21 @@ var PlayListView = Backbone.View.extend({
   },
 
   /*
+   * set currentPlayingPlaylist to false
+   */
+  setCurrentPlayingPlaylist: function(isCurrentlyPlaying) {
+    this.currentPlayingPlaylist = isCurrentlyPlaying;
+  },
+  
+  setCurrentPlayingPlaylist: function(currentPlaylistId) {
+    this.currentPlayingPlaylist = (currentPlaylistId == this.model.get('id'))
+  },
+  
+  /*
    * show playlist view in middle nav //TODO add auto play ?
    */
   playPlaylist: function() {
+    this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
     //hide search results
     $('#search_results_view').hide();
     //show playlist view
@@ -439,9 +469,12 @@ var PlayListView = Backbone.View.extend({
 
     _.each(this.model.songs.models, function(song){
       //TODO(shalinikurian): Refactor this so that the songs are not responsible for reordering.
-      var songView = new SongView({model: song, songCollection: this.model.songs});
+      var songView = new SongView({
+        model: song,
+        vent: vent
+        });
       $("#songs").append(songView.render().el);
-    }).bind(this);
+    });
 
   }
 
@@ -452,16 +485,15 @@ var PlayListView = Backbone.View.extend({
  */
 
 var SongView = Backbone.View.extend({
-  tagName: 'tr',
 
   events: {
     'click' : 'playSong',
     'click .delete' : 'deleteSong'
   },
 
-  initialize: function(options) {
-    this.songCollection = options.songCollection;
+  initialize: function(args) {
     var evenRow = (this.model.get('order') % 2 == 0 );
+    this.vent = args.vent;
     if (evenRow) $(this.el).addClass('even_row');
     else $(this.el).addClass('odd_row');
   },
@@ -481,7 +513,7 @@ var SongView = Backbone.View.extend({
     this.unbind();
     //reorder songs after delete
     this.model.destroy();
-    this.songCollection.reorderAfterDelete();
+    this.vent.trigger('songDeleted');
   },
   
   playSong: function(evt) { //TODO
@@ -495,12 +527,12 @@ var SongView = Backbone.View.extend({
 var Songs = Backbone.Collection.extend({
   model : Song,
   localStorage: new Store(""),
+
   setLocalStore: function (id) {
     var localKey = "playlist"+id;
     this.localStorage = new Store(localKey); //window needed ?
   },
 
-  
   getNextOrder : function() {
     if (this.length == 0) return 1;
     return this.last().get('order') + 1;
@@ -512,6 +544,7 @@ var Songs = Backbone.Collection.extend({
       song.set('order', order++);
       song.save();
     }.bind(this));
+
   }
 });
 
