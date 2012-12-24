@@ -53,22 +53,20 @@ body {
     position: absolute;
 }
     #new_playlist_name {
-        display: none;
-        position: absolute;
-        top: 35px;
-        left: 10px;
-        width: 105px;
+      display: none;
+    }
+    #add_playlist  {
+      background-color: #2e2e2e;
+      color: white;
+      text-align: center;
     }
 
 
-#add_playlist {
+#add_playlist , #new_playlist_name{
     position: relative;
     top: 10px;
     left: 10px;
     width: 115px;
-    color: white;
-    background-color: #2e2e2e;
-    text-align: center;
     padding: 2px 0px;
     border-radius : 5px;
 }

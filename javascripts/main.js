@@ -280,6 +280,7 @@ var PlayListsView = Backbone.View.extend({
   initialize: function(args){
     this.vent = args.vent;
     this.$textBox = $('#new_playlist_name');
+    this.$addPlaylistButton = $('#add_playlist');
     this.$playlists = $('#playlists');
     this.$playlists.sortable({
       axis: 'y',
@@ -313,20 +314,24 @@ var PlayListsView = Backbone.View.extend({
    */
   showNewPlayListTextBox: function(e) {
     this.$textBox.val('');
-    this.$textBox.slideDown('fast', function(){});
+    this.toggleNewPlaylistView();
     this.$textBox.focus();
   },
 
+  toggleNewPlaylistView: function(e) {
+    this.$addPlaylistButton.toggle();
+    this.$textBox.toggle();
+  },
   /*
    * add new playlist to collection of playlists and add to playlist view
    */
   addNewPlayList: function(e) {
     if (e.which == 27) {
-      this.$textBox.slideUp('fast', function(){});
+      this.toggleNewPlaylistView();
     }
 
     if (e.keyCode == 13) {
-      this.$textBox.slideUp('fast', function(){});
+      this.toggleNewPlaylistView();
       var playlistName = this.$textBox.val();
       var order = playlistsCollection.getNextOrder();
       playlistsCollection.create({
