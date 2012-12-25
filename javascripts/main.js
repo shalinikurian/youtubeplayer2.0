@@ -403,8 +403,9 @@ var PlayListView = Backbone.View.extend({
     
   events: {
   'click .delete' : 'deletePlaylist',
-  'click' : 'playPlaylist'
+  'click' : 'playPlaylist',
   },
+
   /*
    * delete playlist , unbind events and remove view, reorder playlists after delete
    */
@@ -469,18 +470,31 @@ var PlayListView = Backbone.View.extend({
     };
     this.playlistView.append(generalInfoTemplate(variables));
     //add song list
+    this.addSongList();
+  },
+  
+  addSongList: function() {
     var songListTemplate = _.template($('#songs_list').html());
     this.playlistView.append(songListTemplate());
-
+    this.songsContainer = $('#songs');
     _.each(this.model.songs.models, function(song){
       //TODO(shalinikurian): Refactor this so that the songs are not responsible for reordering.
       var songView = new SongView({
         model: song,
         vent: vent
         });
-      $("#songs").append(songView.render().el);
+      this.songsContainer.append(songView.render().el);
+    }, this);
+    
+    //make the songs sortable
+    this.songsContainer.sortable({
+      axis: 'y',
+      update: function(e,ui) {
+        var songsOrder = $(e.target).sortable('toArray');
+        this.model.songs.reorderAfterSorting(songsOrder);
+      }.bind(this)
     });
-
+    
   }
 
 });
@@ -501,6 +515,7 @@ var SongView = Backbone.View.extend({
     this.vent = args.vent;
     if (evenRow) $(this.el).addClass('even_row');
     else $(this.el).addClass('odd_row');
+    $(this.el).attr('id', this.model.id);
   },
   
   render: function() {
@@ -549,7 +564,18 @@ var Songs = Backbone.Collection.extend({
       song.set('order', order++);
       song.save();
     }.bind(this));
-
+  },
+  reorderAfterSorting: function(orderedSongsIds) {
+    var order = 1;
+    _.each(orderedSongsIds, function(id){
+      var song = this.get(id);
+      song.set('order', order++);
+      song.save();
+    }.bind(this));
+  },
+  
+  comparator: function(song) {
+    return song.get('order');
   }
 });
 
