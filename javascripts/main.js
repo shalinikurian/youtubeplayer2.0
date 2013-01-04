@@ -46,17 +46,17 @@ var YoutubePlayerView = Backbone.View.extend({
 
     stateChanged: function(event) {
       if (event.data == YT.PlayerState.ENDED) {
-        this.videoEnded()
+        this.videoEnded();
       }
     },
 
     videoEnded: function() {
       // Let other parties know that a video ended.
-      console.log("video ended")
+      console.log("video ended");
     },
 
     apiError: function(error) {
-      alert("Error is " + error)
+      alert("Error is " + error);
     }
   });
 
@@ -164,7 +164,7 @@ var SearchResultsView = Backbone.View.extend({
   },
 
   searchQuery: function(e) {
-    if (e.keyCode == 13) {//enter
+    if (e.keyCode == 13) { // Enter.
       var query = this.$searchBar.val();
       this.fetchQueryFromYoutube(query);
     }
@@ -179,7 +179,7 @@ var SearchResultsView = Backbone.View.extend({
   },
 
   /*
-   * hide playlist view, add songs from search results to view
+   * Hide playlist view, add songs from search results to view.
    */
   populateSearchResults: function(data) {
     $('#playlist_view').hide();
@@ -356,6 +356,17 @@ var PlayListsView = Backbone.View.extend({
   }
 });
 
+
+var modes = {
+  shuffle: 0,
+  repeatOne: 1,
+  repeatAll: 2,
+  none: 3
+}
+
+var generateRandomNumber = function(start, end) {
+  return Math.floor(Math.random() * (end - start) + start)
+}
 /*
  * single playlist view
  */
@@ -371,8 +382,12 @@ var PlayListView = Backbone.View.extend({
     this.vent = args.vent;
     this.currentPlayingPlaylist = false;
 
-    _.bindAll(this, 'songDeleted', 'remove', 'setCurrentPlayingPlaylist');
-    
+    // Set the mode to none.
+    this.setMode(modes.none);
+    this.currentlyPlayingSong = null;
+
+    _.bindAll(this, 'songDeleted', 'remove', 'setCurrentPlayingPlaylist', 'playParticularSong');
+    this.vent.bind("songClicked", this.playParticularSong);
     this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
     this.vent.bind("songDeleted", this.songDeleted);
     this.model.bind('destroy', this.remove);
@@ -403,7 +418,8 @@ var PlayListView = Backbone.View.extend({
     
   events: {
   'click .delete' : 'deletePlaylist',
-  'click' : 'playPlaylist',
+  'click' : 'switchToPlaylist',
+  // Add click handler for changing mode.
   },
 
   /*
@@ -424,6 +440,10 @@ var PlayListView = Backbone.View.extend({
     return this;
   },
 
+  setMode: function (mode) {
+    this.mode = mode
+  },
+
   /*
    * set currentPlayingPlaylist to false
    */
@@ -434,16 +454,57 @@ var PlayListView = Backbone.View.extend({
   setCurrentPlayingPlaylist: function(currentPlaylistId) {
     this.currentPlayingPlaylist = (currentPlaylistId == this.model.get('id'))
   },
-  
+
+  playParticularSong: function(song) {
+    this.currentlyPlayingSong = song.get('order');
+    YoutubePlayer.playSong(song);
+  },
+
+  playNextSong: function() {
+    var playlistLength = this.model.songs.length
+    if (playlistLength > 0) {
+      switch (this.mode) {
+        case modes.repeatAll:
+        case modes.none:
+          this.playSequentialSong(playlistLength)
+          break;
+        case modes.shuffle:
+          this.currentlyPlayingSong = generateRandomNumber(1, playlistLength);
+          var newSong = this.model.songs[this.currentlyPlayingSong]
+          YoutubePlayer.playSong(newSong)
+          break;
+        case modes.repeatOne:
+          break;
+      }
+    }
+  },
+
+  playSequentialSong: function(playlistLength) {
+    if (this.currentlyPlayingSong == null) {
+      var newSong = this.model.songs.first()
+      this.currentlyPlayingSong = newSong.get('order')
+      YoutubePlayer.playSong(newSong)
+    } else if (this.currentlyPlayingSong < playlistLength) {
+      this.currentlyPlayingSong += 1;
+      var newSong = this.model.songs[this.currentlyPlayingSong]
+      YoutubePlayer.playSong(newSong)
+    } else if (this.mode == modes.repeatAll) {
+      this.currentlyPlayingSong = 1;
+      var newSong = this.model.songs[this.currentlyPlayingSong]
+      YoutubePlayer.playSong(newSong)
+    }
+  },
+
   /*
    * show playlist view in middle nav //TODO add auto play ?
    */
-  playPlaylist: function() {
+  switchToPlaylist: function() {
     this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
     //hide search results
     $('#search_results_view').hide();
     //show playlist view
     this.showPlayList();
+    this.playNextSong();
   },
 
   /*
@@ -453,15 +514,10 @@ var PlayListView = Backbone.View.extend({
   showPlayList: function() {
     this.playlistView.html('').show();
     var noOfSongs = this.model.songs.length;
-    if (noOfSongs == 0 ){
-
-    } else {
-
-    }
     var playlistTemplate = (noOfSongs == 0) ? (_.template($('#playlist_info_template_no_songs').html())) : (_.template($('#playlist_info_template').html()));
     var variables = (noOfSongs == 0) ? {} : {"thumbnail1": this.model.songs.last().get('thumbnail')};
     this.playlistView.append(playlistTemplate(variables));
-    //general info
+    // General info.
     var generalInfoTemplate = _.template($('#playlist_info_template_general').html());
     variables = {
       "title":this.model.get('name'),
@@ -537,6 +593,7 @@ var SongView = Backbone.View.extend({
   },
   
   playSong: function(evt) { //TODO
+    this.vent.trigger("songClicked", this.model);
   }
 });
 
