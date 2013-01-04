@@ -442,11 +442,12 @@ var PlayListView = Backbone.View.extend({
           var rand = 0;
           // Pick a random song that is not equal to the current one. If there is only one song in the playlist,
           // then there is no choice but to pick that one.
+          console.log("Before " + this.currentlyPlayingSong)
           do {
             rand = generateRandomNumber(0, playlistLength - 1);
             console.log(rand)
           } while (rand === this.currentlyPlayingSong || playlistLength === 1);
-          var rand = generateRandomNumber(0, playlistLength - 1);
+          console.log("After " + rand)
           this.currentlyPlayingSong = rand;
           var newSong = this.model.songs.models[this.currentlyPlayingSong]
           YoutubePlayer.playSong(newSong)
