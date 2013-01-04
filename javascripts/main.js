@@ -40,7 +40,6 @@ var YoutubePlayerView = Backbone.View.extend({
   },
 
     playerReady: function(event) {
-      console.log("In playerReady function ready to play")
        this.player.playVideo();
     },
 
@@ -52,7 +51,7 @@ var YoutubePlayerView = Backbone.View.extend({
 
     videoEnded: function() {
       // Let other parties know that a video ended.
-      console.log("video ended");
+      this.vent.trigger("videoEnded")
     },
 
     apiError: function(error) {
@@ -162,6 +161,8 @@ var SearchResultsView = Backbone.View.extend({
  // Hide playlist view, add songs from search results to view.
   populateSearchResults: function(data) {
     $('#playlist_view').hide();
+    // Trigger an event so that playlists can react.
+    this.vent.trigger("searchStarted")
     this.$searchResultsContainer.html('');
     this.$searchResultsContainer.show();
     $.each(data.data.items, function(index, song){
@@ -246,8 +247,8 @@ var PlayListsView = Backbone.View.extend({
   el : '#left_nav',
 
   // Make playlist sortable and render view.
-  initialize: function(args){
-    this.vent = args.vent;
+  initialize: function(args) {
+    this.currentlyPlayingPlaylist = null;
     this.$textBox = $('#new_playlist_name');
     this.$addPlaylistButton = $('#add_playlist');
     this.$playlists = $('#playlists');
@@ -271,7 +272,6 @@ var PlayListsView = Backbone.View.extend({
   },
 
   //Reorder playlist order for sortable.
-
   reorderPlaylists: function(e, ui) {
    var playlistsOrder = $(e.target).sortable('toArray');
    playlistsCollection.reorderAfterSorting(playlistsOrder);
@@ -329,10 +329,10 @@ var modes = {
 }
 
 var generateRandomNumber = function(start, end) {
-  return Math.floor(Math.random() * (end - start) + start)
+  return Math.floor(Math.random() * (end - start + 1) + start)
 }
 
-// Single playlist view.
+// Single playlist view middle div.
 var PlayListView = Backbone.View.extend({
   tagName : 'div',
 
@@ -344,11 +344,13 @@ var PlayListView = Backbone.View.extend({
     this.currentPlayingPlaylist = false;
 
     // Set the mode to none.
-    this.setMode(modes.none);
+    this.setMode(modes.shuffle);
     this.currentlyPlayingSong = null;
 
-    _.bindAll(this, 'songDeleted', 'remove', 'setCurrentPlayingPlaylist', 'playParticularSong');
+    _.bindAll(this, 'songDeleted', 'remove', 'setCurrentPlayingPlaylist', 'playParticularSong', 'onVideoEnd', 'onSearchStart');
     this.vent.bind("songClicked", this.playParticularSong);
+    this.vent.bind("videoEnded", this.onVideoEnd)
+    this.vent.bind("searchStarted", this.onSearchStart)
     this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
     this.vent.bind("songDeleted", this.songDeleted);
     this.model.bind('destroy', this.remove);
@@ -404,6 +406,11 @@ var PlayListView = Backbone.View.extend({
     this.mode = mode
   },
 
+  onSearchStart: function() {
+    // When a search starts make sure we set this to false so that we do not react to video ended events anymore.
+    this.currentPlayingPlaylist = false;
+  },
+
   setCurrentPlayingPlaylist: function(isCurrentlyPlaying) {
     this.currentPlayingPlaylist = isCurrentlyPlaying;
   },
@@ -413,8 +420,14 @@ var PlayListView = Backbone.View.extend({
   },
 
   playParticularSong: function(song) {
-    this.currentlyPlayingSong = song.get('order');
+    this.currentlyPlayingSong = song.get('order') - 1;
     YoutubePlayer.playSong(song);
+  },
+
+  onVideoEnd: function() {
+    if (this.currentPlayingPlaylist) {
+      this.playNextSong();
+    }
   },
 
   playNextSong: function() {
@@ -426,8 +439,16 @@ var PlayListView = Backbone.View.extend({
           this.playSequentialSong(playlistLength)
           break;
         case modes.shuffle:
-          this.currentlyPlayingSong = generateRandomNumber(1, playlistLength);
-          var newSong = this.model.songs[this.currentlyPlayingSong]
+          var rand = 0;
+          // Pick a random song that is not equal to the current one. If there is only one song in the playlist,
+          // then there is no choice but to pick that one.
+          do {
+            rand = generateRandomNumber(0, playlistLength - 1);
+            console.log(rand)
+          } while (rand === this.currentlyPlayingSong || playlistLength === 1);
+          var rand = generateRandomNumber(0, playlistLength - 1);
+          this.currentlyPlayingSong = rand;
+          var newSong = this.model.songs.models[this.currentlyPlayingSong]
           YoutubePlayer.playSong(newSong)
           break;
         case modes.repeatOne:
@@ -439,15 +460,15 @@ var PlayListView = Backbone.View.extend({
   playSequentialSong: function(playlistLength) {
     if (this.currentlyPlayingSong == null) {
       var newSong = this.model.songs.first()
-      this.currentlyPlayingSong = newSong.get('order')
+      this.currentlyPlayingSong = newSong.get('order') - 1;
       YoutubePlayer.playSong(newSong)
-    } else if (this.currentlyPlayingSong < playlistLength) {
+    } else if (this.currentlyPlayingSong < playlistLength - 1) {
       this.currentlyPlayingSong += 1;
-      var newSong = this.model.songs[this.currentlyPlayingSong]
+      var newSong = this.model.songs.models[this.currentlyPlayingSong]
       YoutubePlayer.playSong(newSong)
     } else if (this.mode == modes.repeatAll) {
-      this.currentlyPlayingSong = 1;
-      var newSong = this.model.songs[this.currentlyPlayingSong]
+      this.currentlyPlayingSong = 0;
+      var newSong = this.model.songs.models[this.currentlyPlayingSong]
       YoutubePlayer.playSong(newSong)
     }
   },
