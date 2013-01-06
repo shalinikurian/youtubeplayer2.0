@@ -443,10 +443,12 @@ var PlayListView = Backbone.View.extend({
           // Pick a random song that is not equal to the current one. If there is only one song in the playlist,
           // then there is no choice but to pick that one.
           console.log("Before " + this.currentlyPlayingSong)
-          do {
+          if (playlistLength != 1) {
+            do {
             rand = generateRandomNumber(0, playlistLength - 1);
             console.log(rand)
-          } while (rand === this.currentlyPlayingSong || playlistLength === 1);
+            } while (rand === this.currentlyPlayingSong);
+          }
           console.log("After " + rand)
           this.currentlyPlayingSong = rand;
           var newSong = this.model.songs.models[this.currentlyPlayingSong]
