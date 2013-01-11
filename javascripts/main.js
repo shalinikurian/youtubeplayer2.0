@@ -188,7 +188,6 @@ var SearchResultsView = Backbone.View.extend({
 
  // Hide playlist view, add songs from search results to view.
   populateSearchResults: function() {
-    $('#playlist_view').hide();
     // Trigger an event so that playlists can react.
     this.vent.trigger("searchStarted")
     this.$searchResultsContainer.html('');
@@ -312,7 +311,7 @@ var PlayListsView = Backbone.View.extend({
 
   // Add playlist to playlists view.
   appendPlaylistToView: function(playlist) {
-    var playlistView = new PlayListView({
+    var playlistView = new PlayListItemView({
       model: playlist,
       vent: vent
     });
@@ -333,30 +332,24 @@ var generateRandomNumber = function(start, end) {
   return Math.floor(Math.random() * (end - start + 1) + start)
 }
 
-// Single playlist view middle div.
-var PlayListView = Backbone.View.extend({
+var PlayListItemView = Backbone.View.extend({
   tagName : 'div',
-
+  
   className: 'playlistItem',
-
+  
   // Make playlist item droppable.
   initialize: function(args) {
     this.vent = args.vent;
     this.currentPlayingPlaylist = false;
 
-    // Set the mode to none.
-    this.setMode(modes.shuffle);
     this.currentlyPlayingSong = null;
 
-    _.bindAll(this, 'songDeleted', 'remove', 'setCurrentPlayingPlaylist', 'playParticularSong', 'onVideoEnd', 'onSearchStart');
-    this.vent.bind("songClicked", this.playParticularSong);
-    this.vent.bind("videoEnded", this.onVideoEnd)
-    this.vent.bind("searchStarted", this.onSearchStart)
+    _.bindAll(this, 'remove','setCurrentPlayingPlaylist', 'onSearchStart');
+
+    this.vent.bind("searchStarted", this.onSearchStart);
     this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
-    this.vent.bind("songDeleted", this.songDeleted);
     this.model.bind('destroy', this.remove);
-    
-    this.playlistView = $('#playlist_view');
+
     $(this.el).attr('id', this.model.id);
     
     this.$template = _.template($('#playlist_template').html());
@@ -370,23 +363,13 @@ var PlayListView = Backbone.View.extend({
         ui.helper.hide();
       }.bind(this)
     });
-
   },
   
-  songDeleted: function() {
-    if (this.currentPlayingPlaylist) {
-      this.model.songs.reorderAfterDelete();
-    }
-  },
-  
-    
   events: {
-  'click .delete' : 'deletePlaylist',
-  'click' : 'switchToPlaylist',
-  // Add click handler for changing mode.
+    'click .delete' : 'deletePlaylist',
+    'click .name' : 'switchToPlaylist',
   },
-
-
+  
   // Delete playlist , unbind events and remove view, reorder playlists after delete.
   deletePlaylist: function(e){
     this.unbind();
@@ -402,24 +385,102 @@ var PlayListView = Backbone.View.extend({
     $(this.el).html(this.$template(this.model.toJSON()));
     return this;
   },
-
-  setMode: function (mode) {
-    this.mode = mode
-  },
-
+  
   onSearchStart: function() {
     // When a search starts make sure we set this to false so that we do not react to video ended events anymore.
     this.currentPlayingPlaylist = false;
   },
-
-  setCurrentPlayingPlaylist: function(isCurrentlyPlaying) {
-    this.currentPlayingPlaylist = isCurrentlyPlaying;
+  
+  switchToPlaylist: function() {
+    this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
+    // Hide search results.
+    $('#search_results_view').hide();
+    //make a playlistContentView
+    var playlistContentView = new PlayListContentView({
+      'model': this.model,
+      'vent' : this.vent
+    });
   },
   
   setCurrentPlayingPlaylist: function(currentPlaylistId) {
     this.currentPlayingPlaylist = (currentPlaylistId == this.model.get('id'))
   },
+});
 
+var PlayListContentView = Backbone.View.extend({
+  el: '#playlist_view',
+
+  initialize: function(args) {
+    this.$el.empty();
+    this.model = args.model;
+    this.vent = args.vent;
+    
+    this.setMode(modes.shuffle);
+    
+    _.bindAll(this);
+    this.model.bind('destroy', this.remove);
+    this.vent.bind("songDeleted", this.songDeleted);
+    this.vent.bind("searchStarted", this.onSearchStart);
+    this.vent.bind("songClicked", this.playParticularSong);
+    this.vent.bind("videoEnded", this.onVideoEnd);
+
+    this.showPlayList();
+    
+  },
+
+  remove: function() {
+    $(this.el).empty();
+  },
+  
+  setMode: function (mode) {
+    this.mode = mode
+  },
+  
+  // Get templates for playlist information. render views.
+  showPlayList: function() {
+    var noOfSongs = this.model.songs.length;
+    var playlistTemplate = (noOfSongs == 0) ? (_.template($('#playlist_info_template_no_songs').html())) : (_.template($('#playlist_info_template').html()));
+    var variables = (noOfSongs == 0) ? {} : {"thumbnail1": this.model.songs.last().get('thumbnail')};
+    this.$el.append(playlistTemplate(variables));
+    // General info.
+    var generalInfoTemplate = _.template($('#playlist_info_template_general').html());
+    variables = {
+      "title":this.model.get('name'),
+      "noOfSongs" : this.model.songs.length ,
+      "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
+    };
+    this.$el.append(generalInfoTemplate(variables));
+    // Add song list.
+    this.addSongList();
+  },
+  
+  addSongList: function() {
+    var songListTemplate = _.template($('#songs_list').html());
+    this.$el.append(songListTemplate());
+    this.songsContainer = $('#songs');
+    _.each(this.model.songs.models, function(song){
+      //TODO(shalinikurian): Refactor this so that the songs are not responsible for reordering.
+      var songView = new SongView({
+        model: song,
+        vent: vent
+        });
+      this.songsContainer.append(songView.render().el);
+    }, this);
+    
+    // Make the songs sortable.
+    this.songsContainer.sortable({
+      axis: 'y',
+      update: function(e,ui) {
+        var songsOrder = $(e.target).sortable('toArray');
+        this.model.songs.reorderAfterSorting(songsOrder);
+      }.bind(this)
+    });
+  },
+
+  songDeleted: function() {
+    this.model.songs.reorderAfterDelete();
+  },
+  
   playParticularSong: function(song) {
     this.currentlyPlayingSong = song.get('order') - 1;
     YoutubePlayer.playSong(song);
@@ -477,67 +538,13 @@ var PlayListView = Backbone.View.extend({
     }
   },
 
-  // Show playlist view in middle nav.
-
-  switchToPlaylist: function() {
-    this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
-    // Hide search results.
-    $('#search_results_view').hide();
-    // Show playlist view.
-    this.showPlayList();
-    this.playNextSong();
-  },
-
-   // Get templates for playlist information. render views.
-  showPlayList: function() {
-    this.playlistView.html('').show();
-    var noOfSongs = this.model.songs.length;
-    var playlistTemplate = (noOfSongs == 0) ? (_.template($('#playlist_info_template_no_songs').html())) : (_.template($('#playlist_info_template').html()));
-    var variables = (noOfSongs == 0) ? {} : {"thumbnail1": this.model.songs.last().get('thumbnail')};
-    this.playlistView.append(playlistTemplate(variables));
-    // General info.
-    var generalInfoTemplate = _.template($('#playlist_info_template_general').html());
-    variables = {
-      "title":this.model.get('name'),
-      "noOfSongs" : this.model.songs.length ,
-      "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
-    };
-    this.playlistView.append(generalInfoTemplate(variables));
-    // Add song list.
-    this.addSongList();
-  },
-  
-  addSongList: function() {
-    var songListTemplate = _.template($('#songs_list').html());
-    this.playlistView.append(songListTemplate());
-    this.songsContainer = $('#songs');
-    _.each(this.model.songs.models, function(song){
-      //TODO(shalinikurian): Refactor this so that the songs are not responsible for reordering.
-      var songView = new SongView({
-        model: song,
-        vent: vent
-        });
-      this.songsContainer.append(songView.render().el);
-    }, this);
-    
-    // Make the songs sortable.
-    this.songsContainer.sortable({
-      axis: 'y',
-      update: function(e,ui) {
-        var songsOrder = $(e.target).sortable('toArray');
-        this.model.songs.reorderAfterSorting(songsOrder);
-      }.bind(this)
-    });
-    
-  }
-
 });
 
 // Song view.
 var SongView = Backbone.View.extend({
 
   events: {
-    'click' : 'playSong',
+    'click .song' : 'playSong',
     'click .delete' : 'deleteSong'
   },
 
@@ -633,7 +640,9 @@ var PlaylistSongs = SongsCollection.extend({
   reorderAfterSorting: function(orderedSongsIds) {
     var order = 1;
     _.each(orderedSongsIds, function(id){
-      var song = this.get(id);
+      var song = this.find(function(song){
+        return song.get('id') == id;
+      });
       song.set('order', order++);
       song.save();
     }.bind(this));
