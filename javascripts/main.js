@@ -83,7 +83,37 @@ var durationForDisplay = function(secs){
 
 // Song model used for both search result song item and playlist song item.
 var Song = Backbone.Model.extend({});
+var SearchViewSong = Song.extend({
 
+  parse: function(response){
+    var attributes = {
+      'title' : response.title,
+      'thumbnail' : response.thumbnail.sqDefault,
+      'duration': this.durationForDisplay(response.duration),
+      'actual_duration': response.duration,
+      'song_id': response.id
+    }
+    return attributes;
+  },
+  
+  // Pretty print duration for search result item.
+  durationForDisplay: function(secs){
+    var hrs = Math.floor(secs/3600);
+    var rem = secs % 3600;
+    var min = Math.floor(rem/60);
+    secs = rem % 60;
+    var str = "";
+    if (hrs > 0 ) {
+      str = hrs.toString() + ":";
+    }
+    var secsStr = secs.toString();
+    if (secs < 10 ) {
+      secsStr = '0' + secsStr;
+    }
+    str = str + min.toString() +":"+ secsStr;
+    return str;
+  }
+});
 
 // Playlist model.
 var Playlist = Backbone.Model.extend({
@@ -93,7 +123,7 @@ var Playlist = Backbone.Model.extend({
 
    // Make new song collection and fetch songs in playlist from local store.
   initialize: function() {
-    this.songs = new Songs();
+    this.songs = new PlaylistSongs();
     if (this.id) {
       this.songs.setLocalStore(this.id);
       this.songs.fetch();
@@ -105,13 +135,12 @@ var Playlist = Backbone.Model.extend({
   addSong: function(songToAdd) {
     var song = new Song(songToAdd.toJSON());  // Make new song model.
     song.set('order', this.songs.getNextOrder());  // Set order of new song.
-    // Do we need to add playlist?
     // Add song to songs collection.
     this.songs.create(song);
     this.songs.last().save();
     },
 
-// Calculate and store duration for pretty print
+  // Calculate and store duration for pretty print
   playlistDuration: function() {
     var totalDuration = 0;
     _.each(this.songs.models, function(song){
@@ -132,6 +161,7 @@ var SearchResultsView = Backbone.View.extend({
     this.$searchResultsContainer = $('#search_results_view');
     this.maxResults = args.maxResults | 10;
     this.vent = args.vent;
+    this.collection = new SearchBarSongsCollection();
     this.clearSearchBar();
   },
 
@@ -146,64 +176,35 @@ var SearchResultsView = Backbone.View.extend({
   searchQuery: function(e) {
     if (e.keyCode == 13) { // Enter.
       var query = this.$searchBar.val();
-      this.fetchQueryFromYoutube(query);
+      //this.fetchQueryFromYoutube(query);
+      this.collection.setQuery(query);
+      this.collection.fetch({
+        success: function() {
+          this.populateSearchResults();
+        }.bind(this)
+      });
     }
   },
 
-  // TODO(shalinikurian): We should treat the fetching as a rest API and make it part of the collection, instead of a discreet function.
-  fetchQueryFromYoutube: function(query) {
-    var youtubeUrl = "https://gdata.youtube.com/feeds/api/videos?q="+query+"&max-results="+this.maxResults+"&v=2&alt=jsonc&callback=?";
-    $.getJSON(youtubeUrl, function(data){
-      this.populateSearchResults(data);
-    }.bind(this));
-  },
-
  // Hide playlist view, add songs from search results to view.
-  populateSearchResults: function(data) {
+  populateSearchResults: function() {
     $('#playlist_view').hide();
     // Trigger an event so that playlists can react.
     this.vent.trigger("searchStarted")
     this.$searchResultsContainer.html('');
     this.$searchResultsContainer.show();
-    $.each(data.data.items, function(index, song){
-      this.addSong(song);
+    this.collection.each(function(song){
+       this.addSongToSearchView(song);
     }.bind(this));
   },
 
-  // Make song model. make search result song view and append to search results.
-  addSong: function(songItem) {
-    var song = new Song({
-      'title' : songItem.title,
-      'thumbnail' : songItem.thumbnail.sqDefault,
-      'duration': this.durationForDisplay(songItem.duration),
-      'actual_duration': songItem.duration,
-      'song_id' : songItem.id,
-    });
-
+  addSongToSearchView: function(song) {
     var searchResultSongView = new SearchResultSongView({
       model: song
     });
 
     this.$searchResultsContainer.append(searchResultSongView.render().el);
   },
-
-  // Pretty print duration for search result item.
-  durationForDisplay: function(secs){
-    var hrs = Math.floor(secs/3600);
-    var rem = secs % 3600;
-    var min = Math.floor(rem/60);
-    secs = rem % 60;
-    var str = "";
-    if (hrs > 0 ) {
-      str = hrs.toString() + ":";
-    }
-    var secsStr = secs.toString();
-    if (secs < 10 ) {
-      secsStr = '0' + secsStr;
-    }
-    str = str + min.toString() +":"+ secsStr;
-    return str;
-  }
 
 });
 
@@ -572,7 +573,43 @@ var SongView = Backbone.View.extend({
 
 // Collections.
 
-var Songs = Backbone.Collection.extend({
+var SongsCollection = Backbone.Collection.extend({
+  
+});
+
+var SearchBarSongsCollection = SongsCollection.extend({
+  model: SearchViewSong,
+  
+  initialize: function() {
+    this.query="";
+    this.maxResults = 10;
+  },
+  
+  url: function() {
+    return "https://gdata.youtube.com/feeds/api/videos?q="+this.query+"&max-results="+this.maxResults+"&v=2&alt=jsonc&callback=?";
+  },
+
+  setQuery: function(query) {
+    this.query = query;
+  },
+
+  sync: function(method, model, options) {
+      var params = _.extend({
+            type: 'GET',
+            dataType: 'json',
+            url: model.url(),
+            processData: false
+        }, options);
+
+    return $.ajax(params);
+  },
+
+  parse: function(response) {
+    return response.data.items;
+  }
+});
+
+var PlaylistSongs = SongsCollection.extend({
   model : Song,
   localStorage: new Store(""),
 
