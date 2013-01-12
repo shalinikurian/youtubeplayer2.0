@@ -3,11 +3,14 @@ define([
   'jQueryUi',
   'underscore',
   'backbone',
+  'eventBus',
   'views/SearchResultsView',
-], function($, $ui, _, Backbone, SearchResultsView) {
+  'views/YoutubePlayerView'
+], function($, $ui, _, Backbone,vent, SearchResultsView, YoutubePlayer) {
   var initialize = function() {
-    var searchResultsView = new SearchResultsView({el:'body', maxResults:10});
-    //var YoutubePlayer = new YoutubePlayerView();
+    console.log("initializing app");
+    SearchResultsView.initialize();
+    YoutubePlayer.initialize();
   };
   
   return {

@@ -1,9 +1,10 @@
 define([
   'backbone',
-  'eventBus',
+  'eventBus'
 ], function(Backbone, vent){
   var YoutubePlayerView = Backbone.View.extend({
     initialize: function(options) {
+      console.log("initializing youtubeplayer");
       this.apiReady = false;
       this.panelShowing = 0;
       this.vent = vent;
@@ -60,6 +61,21 @@ define([
       }
     });
     
-    var YoutubePlayer = new YoutubePlayerView();
-    return YoutubePlayer;
+    var YoutubePlayer = null;
+
+    var initializeYoutubePlayer = function() {
+      if (YoutubePlayer == null){
+        YoutubePlayer = new YoutubePlayerView();
+      }
+    };
+
+    var getYoutubePlayer = function() {
+      console.log("getting youtube player");
+      return YoutubePlayer;
+    };
+
+    return {
+      initialize: initializeYoutubePlayer,
+      getYoutubePlayer: getYoutubePlayer
+    };
 });

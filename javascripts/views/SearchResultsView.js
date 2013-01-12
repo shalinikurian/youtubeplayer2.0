@@ -54,5 +54,9 @@ define([
     },
   });
   
-  return SearchResultsView;
+  return {
+    initialize: function() {
+      new SearchResultsView({el:'body', maxResults:10});
+    }
+  }
 });
