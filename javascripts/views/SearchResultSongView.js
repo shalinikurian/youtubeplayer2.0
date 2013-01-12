@@ -1,6 +1,7 @@
 define([
-  'backbone'
-], function(Backbone){
+  'backbone',
+  'views/YoutubePlayerView'
+], function(Backbone, YoutubePlayer){
   var SearchResultSongView = Backbone.View.extend({
 
     // Make search results draggable and initialize view with search result template.

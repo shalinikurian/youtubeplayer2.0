@@ -1,13 +1,13 @@
 define([
-  'jQuery',
+  'jQuery', 
   'jQueryUi',
   'underscore',
   'backbone',
   'views/SearchResultsView',
 ], function($, $ui, _, Backbone, SearchResultsView) {
   var initialize = function() {
-    console.log("initialize");
-    var searchResultsView = new SearchResultsView();
+    var searchResultsView = new SearchResultsView({el:'body', maxResults:10});
+    //var YoutubePlayer = new YoutubePlayerView();
   };
   
   return {

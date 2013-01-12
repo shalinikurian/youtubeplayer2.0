@@ -1,11 +1,12 @@
 require.config({
   
   paths: {
-    jQuery: 'libs/jquery/jquery',
+    jQuery: 'libs/jquery/jquery', 
     jQueryUi: 'libs/jquery/jquery-ui.min',
     underscore: 'libs/underscore-min',
     backbone: 'libs/backbone/backbone-min',
-    localStorage: 'libs/backbone/backbone.localStorage'
+    localStorage: 'libs/backbone/backbone.localStorage',
+    eventBus: 'eventBus'
   },
   
   'shim': {
@@ -30,12 +31,8 @@ require.config({
 });
 
 require([
-  'jQuery',
-  'jQueryUi',
-  'underscore',
   'backbone',
   'app'
-], function($, $ui, _, Backbone, App){
-  debugger;
+], function(Backbone, App){
   App.initialize();
 });
