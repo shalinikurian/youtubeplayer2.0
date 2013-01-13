@@ -1,7 +1,8 @@
 define([
   'backbone',
-  'collections/PlaylistSongs'
-], function(Backbone, PlaylistSongs){
+  'collections/PlaylistSongs',
+  'models/Song'
+], function(Backbone, PlaylistSongs, Song){
   var Playlist = Backbone.Model.extend({
     defaults: {
       name: "New Playlist"
@@ -22,7 +23,7 @@ define([
       var song = new Song(songToAdd.toJSON());  // Make new song model.
       song.set('order', this.songs.getNextOrder());  // Set order of new song.
       // Add song to songs collection.
-      this.songs.create(song);
+      this.songs.add(song);
       this.songs.last().save();
       },
   
@@ -32,7 +33,24 @@ define([
       _.each(this.songs.models, function(song){
         totalDuration = totalDuration + song.get('actual_duration');
       }.bind(this));
-      return durationForDisplay(totalDuration);
+      return this.durationForDisplay(totalDuration);
+    },
+    
+    durationForDisplay : function(secs){
+      var hrs = Math.floor(secs/3600);
+      var rem = secs % 3600;
+      var min = Math.floor(rem/60);
+      secs = rem % 60;
+      var str = "";
+      if (hrs > 0 ) {
+        str = hrs.toString() + " h ";
+      }
+      var secsStr = secs.toString();
+      if (secs < 10 ) {
+        secsStr = '0' + secsStr;
+      }
+      str = str + min.toString() + " m "+ secsStr + " s ";
+      return str;
     }
   });
   

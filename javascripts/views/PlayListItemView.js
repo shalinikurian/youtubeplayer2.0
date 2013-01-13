@@ -2,7 +2,8 @@ define([
   'backbone',
   'eventBus',
   'collections/PlayListCollection',
-], function(Backbone, vent, playlistsCollection){
+  'views/PlayListContentView'
+], function(Backbone, vent, playlistsCollection, PlayListContentView){
   var PlayListItemView = Backbone.View.extend({
     tagName : 'div',
     
@@ -73,7 +74,6 @@ define([
       //make a playlistContentView
       var playlistContentView = new PlayListContentView({
         'model': this.model,
-        'vent' : this.vent
       });
     },
     
