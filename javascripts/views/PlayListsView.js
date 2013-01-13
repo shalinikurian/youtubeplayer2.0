@@ -75,8 +75,6 @@ define([
   
     // Add playlist to playlists view.
     appendPlaylistToView: function(playlist) {
-      console.log("appending");
-      console.log(playlist);
       var playlistView = new PlayListItemView({
         model: playlist
       });

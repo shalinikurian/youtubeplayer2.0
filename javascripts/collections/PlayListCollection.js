@@ -14,6 +14,7 @@ define([
   
     reorderAfterDelete: function() {
       var order = 1;
+      this.fetch();
       _.each(this.models, function(playlist){
         playlist.set('order', order++);
         playlist.save();

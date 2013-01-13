@@ -22,11 +22,6 @@ function guid() {
 // Our Store is represented by a single JS object in *localStorage*. Create it
 // with a meaningful name, like the name you'd give a table.
 var Store = function(name) {
-  for (var key in localStorage){
-    console.log(key);
-    console.log(localStorage.getItem(key));
-    //localStorage.removeItem(key);
-  }
   this.name = name;
   var store = localStorage.getItem(this.name);
   this.records = (store && store.split(",")) || [];
