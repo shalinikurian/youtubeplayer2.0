@@ -1,6 +1,9 @@
 define([
-  'backbone'
-], function(Backbone){
+  'backbone',
+  'collections/PlayListCollection',
+  'views/PlayListItemView',
+  'models/Playlist'
+], function(Backbone, playlistsCollection, PlayListItemView, Playlist){
   var PlayListsView = Backbone.View.extend({
     el : '#left_nav',
   
@@ -10,6 +13,7 @@ define([
       this.$textBox = $('#new_playlist_name');
       this.$addPlaylistButton = $('#add_playlist');
       this.$playlists = $('#playlists');
+      this.playlistsCollection = playlistsCollection.getPlayListCollection();
       this.$playlists.sortable({
         axis: 'y',
         helper: "clone"
@@ -24,7 +28,7 @@ define([
     },
   
     render: function() {
-      _.each(playlistsCollection.models, function(playlist){
+      this.playlistsCollection.each(function(playlist) {
         this.appendPlaylistToView(playlist);
       }.bind(this));
     },
@@ -32,7 +36,7 @@ define([
     //Reorder playlist order for sortable.
     reorderPlaylists: function(e, ui) {
      var playlistsOrder = $(e.target).sortable('toArray');
-     playlistsCollection.reorderAfterSorting(playlistsOrder);
+     this.playlistsCollection.reorderAfterSorting(playlistsOrder);
     },
   
     // Display new playlist text box //TODO consider replacing the new playlist button with the text button spotify style.
@@ -56,19 +60,23 @@ define([
       if (e.keyCode == 13) {
         this.toggleNewPlaylistView();
         var playlistName = this.$textBox.val();
-        var order = playlistsCollection.getNextOrder();
-        playlistsCollection.create({
+        var order = this.playlistsCollection.getNextOrder();
+        var playlist = new Playlist({
           name: playlistName,
           order: order
         });
-        playlistsCollection.last().save();
-        this.appendPlaylistToView(playlistsCollection.last());
+        this.playlistsCollection.add(playlist);
+        this.playlistsCollection.last().save();
+
+        this.appendPlaylistToView(this.playlistsCollection.last());
       }
     },
   
   
     // Add playlist to playlists view.
     appendPlaylistToView: function(playlist) {
+      console.log("appending");
+      console.log(playlist);
       var playlistView = new PlayListItemView({
         model: playlist
       });
@@ -79,6 +87,7 @@ define([
   
   return {
     initialize: function() {
+      playlistsCollection.initialize();
       new PlayListsView();
     }
   }

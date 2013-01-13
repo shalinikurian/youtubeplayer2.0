@@ -1,6 +1,7 @@
 define([
-  'backbone'
-], function(Backbone){
+  'backbone',
+  'collections/PlaylistSongs'
+], function(Backbone, PlaylistSongs){
   var Playlist = Backbone.Model.extend({
     defaults: {
       name: "New Playlist"
@@ -10,7 +11,7 @@ define([
     initialize: function() {
       this.songs = new PlaylistSongs();
       if (this.id) {
-        this.songs.setLocalStore(this.id);
+        this.songs.setLocalStore("songs"+this.id);
         this.songs.fetch();
       }
     },

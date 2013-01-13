@@ -4,7 +4,6 @@ define([
 ], function(Backbone, vent){
   var YoutubePlayerView = Backbone.View.extend({
     initialize: function(options) {
-      console.log("initializing youtubeplayer");
       this.apiReady = false;
       this.panelShowing = 0;
       this.vent = vent;

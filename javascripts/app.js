@@ -9,13 +9,9 @@ define([
   'views/PlayListsView',
 ], function($, $ui, _, Backbone,vent, YoutubePlayer, SearchResultsView, PlayListsView) {
   var initialize = function() {
-    function onYouTubePlayerAPIReady() {
-      vent.trigger("YouTubePlayerAPIReady");
-    }
-    console.log("initializing app");
     YoutubePlayer.initialize();
     SearchResultsView.initialize();
-    //PlayListsView.initialize();
+    PlayListsView.initialize();
   };
   
   return {

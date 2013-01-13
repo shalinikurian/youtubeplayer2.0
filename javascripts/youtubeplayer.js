@@ -35,7 +35,6 @@ require([
   'app'
 ], function(Backbone, App){
   $(document).ready(function() {
-      console.log("document is ready");
       App.initialize();
   });
 });
