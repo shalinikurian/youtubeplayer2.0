@@ -4,13 +4,18 @@ define([
   'underscore',
   'backbone',
   'eventBus',
+  'views/YoutubePlayerView',
   'views/SearchResultsView',
-  'views/YoutubePlayerView'
-], function($, $ui, _, Backbone,vent, SearchResultsView, YoutubePlayer) {
+  'views/PlayListsView',
+], function($, $ui, _, Backbone,vent, YoutubePlayer, SearchResultsView, PlayListsView) {
   var initialize = function() {
+    function onYouTubePlayerAPIReady() {
+      vent.trigger("YouTubePlayerAPIReady");
+    }
     console.log("initializing app");
-    SearchResultsView.initialize();
     YoutubePlayer.initialize();
+    SearchResultsView.initialize();
+    //PlayListsView.initialize();
   };
   
   return {

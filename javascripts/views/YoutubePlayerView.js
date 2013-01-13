@@ -21,14 +21,26 @@ define([
     youTubePlayerAPIReady : function() {
     this.apiReady = true;
     },
-  
+
     playSong: function(song) {
-     if (this.apiReady) {
-        var songUrl = song.get("song_id");
-        if (this.player) {
-          this.player.loadVideoById(songUrl)
-        } else this.player = new YT.Player('video_player_container', {
-            width: 400,
+       var songUrl = song.get('song_id');
+        if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
+          window.onYouTubeIframeAPIReady = function() {
+            this.loadPlayer(songUrl);
+          };
+
+          $.getScript('//www.youtube.com/iframe_api');
+        } else {
+          this.loadPlayer(songUrl);
+        }
+    },
+
+    loadPlayer: function(songUrl) {
+       if (this.player) {
+         this.player.loadVideoById(songUrl)
+       } else {
+         new YT.Player('video_player_container', {
+           width: 400,
             height: 280,
             videoId: songUrl,
             events: {
@@ -37,45 +49,45 @@ define([
               'onStateChange': this.stateChanged,
               'onError': this.errorz
             }
-          });
-        } else alert("api not ready");
+         });
+       }
+    },
+
+    playerReady: function(event) {
+       this.player.playVideo();
     },
   
-      playerReady: function(event) {
-         this.player.playVideo();
-      },
-  
-      stateChanged: function(event) {
-        if (event.data == YT.PlayerState.ENDED) {
-          this.videoEnded();
-        }
-      },
-  
-      videoEnded: function() {
-        // Let other parties know that a video ended.
-        this.vent.trigger("videoEnded")
-      },
-  
-      apiError: function(error) {
-        alert("Error is " + error);
+    stateChanged: function(event) {
+      if (event.data == YT.PlayerState.ENDED) {
+        this.videoEnded();
       }
-    });
-    
-    var YoutubePlayer = null;
+    },
+  
+    videoEnded: function() {
+      // Let other parties know that a video ended.
+      this.vent.trigger("videoEnded")
+    },
 
-    var initializeYoutubePlayer = function() {
-      if (YoutubePlayer == null){
+    apiError: function(error) {
+      alert("Error is " + error);
+    }
+  });
+  
+  var YoutubePlayer = null;
+
+  var initializeYoutubePlayer = function() {
+    if (YoutubePlayer == null){
         YoutubePlayer = new YoutubePlayerView();
-      }
-    };
+    }
+  };
 
-    var getYoutubePlayer = function() {
-      console.log("getting youtube player");
-      return YoutubePlayer;
-    };
+  var getYoutubePlayer = function() {
+    console.log("getting youtube player");
+    return YoutubePlayer;
+  };
 
-    return {
-      initialize: initializeYoutubePlayer,
-      getYoutubePlayer: getYoutubePlayer
-    };
+  return {
+    initialize: initializeYoutubePlayer,
+    getYoutubePlayer: getYoutubePlayer
+  };
 });
