@@ -182,8 +182,9 @@ body {
 
     .playlistItem {
         position: relative;
-        padding: 5px;
         font-size: 16px;
+        margin-bottom: 10px;
+        height: 20px;
     }
 
     .playlist_name {

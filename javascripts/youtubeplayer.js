@@ -6,7 +6,7 @@ require.config({
     underscore: 'libs/underscore-min',
     backbone: 'libs/backbone/backbone-min',
     localStorage: 'libs/backbone/backbone.localStorage',
-    eventBus: 'eventBus'
+    eventBus: 'common/eventBus'
   },
   
   'shim': {
