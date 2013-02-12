@@ -1,7 +1,7 @@
 define([
   'backbone',
   'common/Modes',
-  'views/PlayListSongView'
+  'views/PlayListSongView',
   'eventBus',
   'views/YoutubePlayerView',
   'common/util'

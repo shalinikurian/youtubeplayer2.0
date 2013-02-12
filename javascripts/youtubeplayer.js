@@ -31,9 +31,8 @@ require.config({
 });
 
 require([
-  'backbone',
   'app'
-], function(Backbone, App){
+], function(App){
   $(document).ready(function() {
       App.initialize();
   });
