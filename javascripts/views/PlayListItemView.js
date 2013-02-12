@@ -42,7 +42,7 @@ define([
     
     events: {
       'click .delete' : 'deletePlaylist',
-      'click .name' : 'switchToPlaylist',
+      'click .playlist_name' : 'switchToPlaylist',
     },
     
     // Delete playlist , unbind events and remove view, reorder playlists after delete.
@@ -68,6 +68,7 @@ define([
     },
     
     switchToPlaylist: function() {
+      console.log("hello")
       this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
       // Hide search results.
       $('#search_results_view').hide();

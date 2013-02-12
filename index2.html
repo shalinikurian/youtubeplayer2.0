@@ -41,8 +41,8 @@
         </script>
         <!-- playlist template -->
         <script type="text/template" id="playlist_template">
-          <div class="name"><%= name %></div>
-          <div class = "delete">
+          <span class="playlist_name"><%= name %></span>
+          <span class = "delete">
           </div>
         </script>
         <!--playlist info no songs -->
@@ -68,10 +68,10 @@
         <script type = "text/template" id = "playlist_song">
           <div>
             <div class="song">
-              <img  class="small_thumb" src = "<%= thumbnail %>" /> <%=track%>
-              <div class="song_duration"> <%=duration%> </div>
+              <img  class="small_thumb" src = "<%= thumbnail %>" /> <span class ="song_title"><%=track%></span>
+              <span class="song_duration"> <%=duration%> </span>
+              <span class="delete"/>
             </div>
-            <div class="delete"/>
           </div>
         </script>
         <!-- song list -->
