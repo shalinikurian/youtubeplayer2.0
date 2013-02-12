@@ -36,9 +36,9 @@ define([
 
     loadPlayer: function(songUrl) {
        if (this.player) {
-         this.player.loadVideoById(songUrl)
+         this.player.loadVideoById(songUrl);
        } else {
-         new YT.Player('video_player_container', {
+         this.player = new YT.Player('video_player_container', {
            width: 400,
             height: 280,
             videoId: songUrl,
@@ -53,6 +53,7 @@ define([
     },
 
     playerReady: function(event) {
+      console.log("player is ready")
        this.player.playVideo();
     },
   

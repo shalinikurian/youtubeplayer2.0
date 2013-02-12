@@ -1,10 +1,11 @@
 define([
   'backbone',
   'common/Modes',
-  'views/SongView',
+  'views/PlayListSongView'
   'eventBus',
-  'views/YoutubePlayerView'
-], function(Backbone, modes, SongView, vent, YoutubePlayerView){
+  'views/YoutubePlayerView',
+  'common/util'
+], function(Backbone, modes, SongView, vent, YoutubePlayerView, utils){
   var PlayListContentView = Backbone.View.extend({
     el: '#playlist_view',
   
@@ -14,7 +15,6 @@ define([
       this.vent = vent;
       this.youtubePlayer = YoutubePlayerView.getYoutubePlayer();
       this.setMode(modes.shuffle);
-      
       _.bindAll(this);
       this.model.bind('destroy', this.remove);
       this.vent.bind("songDeleted", this.songDeleted);
@@ -22,6 +22,7 @@ define([
       this.vent.bind("songClicked", this.playParticularSong);
       this.vent.bind("videoEnded", this.onVideoEnd);
       this.showPlayList();
+      this.playNextSong();
       
     },
   
@@ -104,7 +105,7 @@ define([
             console.log("Before " + this.currentlyPlayingSong)
             if (playlistLength != 1) {
               do {
-              rand = generateRandomNumber(0, playlistLength - 1);
+              rand = utils.generateRandomNumber(0, playlistLength - 1);
               console.log(rand)
               } while (rand === this.currentlyPlayingSong);
             }
