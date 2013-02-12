@@ -63,6 +63,7 @@ define([
   
     videoEnded: function() {
       // Let other parties know that a video ended.
+      console.log("vide ended")
       this.vent.trigger("videoEnded")
     },
 

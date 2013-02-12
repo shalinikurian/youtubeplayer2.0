@@ -14,15 +14,9 @@ define([
       this.vent = vent;
       this.model = args.model;
       this.playlistsCollection = playlistsCollection.getPlayListCollection();
-
-      this.currentPlayingPlaylist = false;
-  
-      this.currentlyPlayingSong = null;
-  
-      _.bindAll(this, 'remove','setCurrentPlayingPlaylist', 'onSearchStart');
+      _.bindAll(this, 'remove', 'onSearchStart');
   
       this.vent.bind("searchStarted", this.onSearchStart);
-      this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
       this.model.bind('destroy', this.remove);
   
       $(this.el).attr('id', this.model.id);
@@ -69,18 +63,14 @@ define([
     
     switchToPlaylist: function() {
       console.log("hello")
-      this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
       // Hide search results.
       $('#search_results_view').hide();
       //make a playlistContentView
       var playlistContentView = new PlayListContentView({
         'model': this.model,
       });
-    },
-    
-    setCurrentPlayingPlaylist: function(currentPlaylistId) {
-      this.currentPlayingPlaylist = (currentPlaylistId == this.model.get('id'))
-    },
+      this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
+    }
   });
   
   return PlayListItemView;

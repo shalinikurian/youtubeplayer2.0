@@ -13,6 +13,10 @@ define([
       this.$el.empty();
       this.model = args.model;
       this.vent = vent;
+
+      this.currentPlayingPlaylist = false;
+      this.currentlyPlayingSong = null;
+
       this.youtubePlayer = YoutubePlayerView.getYoutubePlayer();
       this.setMode(modes.shuffle);
       _.bindAll(this);
@@ -21,6 +25,8 @@ define([
       this.vent.bind("searchStarted", this.onSearchStart);
       this.vent.bind("songClicked", this.playParticularSong);
       this.vent.bind("videoEnded", this.onVideoEnd);
+      this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
+
       this.showPlayList();
       this.playNextSong();
       
@@ -85,7 +91,9 @@ define([
     },
   
     onVideoEnd: function() {
+      console.log("playlist content view listening to video ended")
       if (this.currentPlayingPlaylist) {
+        console.log("playlist content view listening to video ended and this is the currently playlist playlist")
         this.playNextSong();
       }
     },
@@ -134,6 +142,10 @@ define([
         var newSong = this.model.songs.models[this.currentlyPlayingSong]
         this.youtubePlayer.playSong(newSong)
       }
+    },
+
+    setCurrentPlayingPlaylist: function(currentPlaylistId) {
+      this.currentPlayingPlaylist = (currentPlaylistId == this.model.get('id'))
     },
   
   });
