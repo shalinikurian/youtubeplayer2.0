@@ -27,8 +27,6 @@ define([
           window.onYouTubeIframeAPIReady = function() {
             this.loadPlayer(songUrl);
           };
-
-          $.getScript('//www.youtube.com/iframe_api');
         } else {
           this.loadPlayer(songUrl);
         }
