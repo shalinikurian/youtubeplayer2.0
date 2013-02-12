@@ -24,10 +24,13 @@ define([
     playSong: function(song) {
        var songUrl = song.get('song_id');
         if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
-          window.onYouTubeIframeAPIReady = function() {
+          window.onYouTubePlayerAPIReady = function() {
+            alert("youtuube api was ready through callback");
+            console.log("here")
             this.loadPlayer(songUrl);
           };
         } else {
+          console.log("there")
           this.loadPlayer(songUrl);
         }
     },
@@ -51,7 +54,6 @@ define([
     },
 
     playerReady: function(event) {
-      console.log("player is ready")
        this.player.playVideo();
     },
   
