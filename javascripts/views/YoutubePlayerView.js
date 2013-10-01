@@ -22,6 +22,7 @@ define([
     },
 
     playSong: function(song) {
+      debugger;
        var songUrl = song.get('song_id');
         if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
           window.onYouTubePlayerAPIReady = function() {
@@ -35,7 +36,7 @@ define([
 
     loadPlayer: function(songUrl) {
        if (this.player) {
-         this.player.loadVideoById(songUrl);
+         this.player.loadVideoById(songUrl, 0, "large");
        } else {
          this.player = new YT.Player('video_player_container', {
            width: 400,

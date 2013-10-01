@@ -244,6 +244,9 @@ body {
     -webkit-box-shadow: 1px 0px 5px 1px black;
 }
 
+.mode.selected_mode {
+    color: red;
+}
 #other_info {
     display: inline-block;
     vertical-align: top;

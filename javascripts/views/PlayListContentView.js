@@ -18,7 +18,7 @@ define([
       this.currentlyPlayingSong = null;
 
       this.youtubePlayer = YoutubePlayerView.getYoutubePlayer();
-      this.setMode(modes.shuffle);
+      this.setMode(modes.none);
       _.bindAll(this);
       this.model.bind('destroy', this.remove);
       this.vent.bind("songDeleted", this.songDeleted);
@@ -31,9 +31,31 @@ define([
       this.playNextSong();
       
     },
-  
+
+    events: {
+      'click .mode' : 'changeMode'
+    },
+
     remove: function() {
       $(this.el).empty();
+    },
+    
+    
+    changeMode : function(evt){
+      var $target = $(evt.target);
+      var mode = $target.data("mode");
+      if (this.mode == mode) {
+        this.setMode(modes.none);
+      }
+      else {
+        switch(mode) {
+          case "shuffle": this.setMode(modes.shuffle);
+          case "repeat_one": this.setMode(modes.repeatOne);
+          case "repeat_all": this.setMode(modes.repeatAll);
+        }
+      }
+      $(".mode").removeClass("selected_mode");
+      $target.toggleClass("selected_mode");
     },
     
     setMode: function (mode) {
@@ -54,6 +76,8 @@ define([
         "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
       };
       this.$el.append(generalInfoTemplate(variables));
+      var modesTemplate = _.template($('#playlist_modes_template').html());
+      this.$el.append(modesTemplate);
       // Add song list.
       this.addSongList();
     },
@@ -104,7 +128,7 @@ define([
         switch (this.mode) {
           case modes.repeatAll:
           case modes.none:
-            this.playSequentialSong(playlistLength)
+            this.playSequentialSong(playlistLength);
             break;
           case modes.shuffle:
             var rand = 0;
@@ -127,19 +151,18 @@ define([
     },
   
     playSequentialSong: function(playlistLength) {
+      var newSong;
       if (this.currentlyPlayingSong == null) {
-        var newSong = this.model.songs.first()
+        newSong = this.model.songs.first();
         this.currentlyPlayingSong = newSong.get('order') - 1;
-        this.youtubePlayer.playSong(newSong)
       } else if (this.currentlyPlayingSong < playlistLength - 1) {
         this.currentlyPlayingSong += 1;
-        var newSong = this.model.songs.models[this.currentlyPlayingSong]
-        this.youtubePlayer.playSong(newSong)
+        newSong = this.model.songs.models[this.currentlyPlayingSong]
       } else if (this.mode == modes.repeatAll) {
         this.currentlyPlayingSong = 0;
-        var newSong = this.model.songs.models[this.currentlyPlayingSong]
-        this.youtubePlayer.playSong(newSong)
+        newSong = this.model.songs.models[this.currentlyPlayingSong]
       }
+      this.youtubePlayer.playSong(newSong);
     },
 
     setCurrentPlayingPlaylist: function(currentPlaylistId) {

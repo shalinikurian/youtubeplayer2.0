@@ -7,6 +7,7 @@
         <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" />
         <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
         <script data-main="javascripts/youtubeplayer.js" src="javascripts/libs/require/require.js"></script>
+        <script src="javascripts/swfobject.js"></script>
         <title>Youtubeplayer2.0</title>
     </head>
     <body>
@@ -63,6 +64,14 @@
             <div id ="playlist_title"><%=title%></div>
             <div id ="playlist_time"><%=noOfSongs%> songs, <%=duration%></div>
           </div>
+        </script>
+        <!--playlist modes-->
+        <script type ="text/template" id ="playlist_modes_template">
+         <div id ="modes">
+            <div class = "mode" data-mode="shuffle" >Shuffle</div>
+            <div class = "mode" data-mode="repeat_one" >Repeat One</div>
+            <div class = "mode" data-mode="repeat_all" >Repeat All</div>
+           </div>
         </script>
         <!-- song in playlist -->
         <script type = "text/template" id = "playlist_song">
