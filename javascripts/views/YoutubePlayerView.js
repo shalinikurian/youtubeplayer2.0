@@ -25,8 +25,6 @@ define([
        var songUrl = song.get('song_id');
         if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
           window.onYouTubePlayerAPIReady = function() {
-            alert("youtuube api was ready through callback");
-            console.log("here")
             this.loadPlayer(songUrl);
           };
         } else {

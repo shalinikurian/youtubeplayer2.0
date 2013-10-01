@@ -68,7 +68,7 @@ define([
         this.playlistsCollection.add(playlist);
         this.playlistsCollection.last().save();
 
-        this.appendPlaylistToView(this.playlistsCollection.last());
+        this.appendPlaylistToView(playlist);
       }
     },
   

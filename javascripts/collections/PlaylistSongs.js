@@ -5,11 +5,12 @@ define([
 ], function(SongsCollection, Song, Store){
   var PlaylistSongs = SongsCollection.extend({
     model : Song,
-    localStorage: new Store(""),
+    //localStorage: new Store(""),
   
     setLocalStore: function (id) {
       var localKey = "playlist"+id;
-      this.localStorage = new Store(localKey);  // Window needed?
+      this.localStorage = new Store(localKey);
+      console.log(this.localStorage);
     },
   
     getNextOrder : function() {

@@ -62,7 +62,6 @@ define([
     },
     
     switchToPlaylist: function() {
-      console.log("hello")
       // Hide search results.
       $('#search_results_view').hide();
       //make a playlistContentView

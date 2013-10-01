@@ -11,15 +11,18 @@ define([
      // Make new song collection and fetch songs in playlist from local store.
     initialize: function() {
       this.songs = new PlaylistSongs();
+      this.getSongs();
+    },
+  
+    getSongs: function() {
       if (this.id) {
         this.songs.setLocalStore("songs"+this.id);
         this.songs.fetch();
       }
     },
-  
     // Add song to playlist.
-  
     addSong: function(songToAdd) {
+      this.getSongs();
       var song = new Song(songToAdd.toJSON());  // Make new song model.
       song.set('order', this.songs.getNextOrder());  // Set order of new song.
       // Add song to songs collection.

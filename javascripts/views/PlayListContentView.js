@@ -82,6 +82,7 @@ define([
   
     songDeleted: function() {
       this.model.songs.reorderAfterDelete();
+      this.showPlaylist();
       //re render TODO
     },
     
@@ -93,7 +94,6 @@ define([
     onVideoEnd: function() {
       console.log("playlist content view listening to video ended")
       if (this.currentPlayingPlaylist) {
-        console.log("playlist content view listening to video ended and this is the currently playlist playlist")
         this.playNextSong();
       }
     },
@@ -110,14 +110,12 @@ define([
             var rand = 0;
             // Pick a random song that is not equal to the current one. If there is only one song in the playlist,
             // then there is no choice but to pick that one.
-            console.log("Before " + this.currentlyPlayingSong)
             if (playlistLength != 1) {
               do {
               rand = utils.generateRandomNumber(0, playlistLength - 1);
               console.log(rand)
               } while (rand === this.currentlyPlayingSong);
             }
-            console.log("After " + rand)
             this.currentlyPlayingSong = rand;
             var newSong = this.model.songs.models[this.currentlyPlayingSong]
             this.youtubePlayer.playSong(newSong)
