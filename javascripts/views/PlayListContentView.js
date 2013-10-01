@@ -16,6 +16,7 @@ define([
 
       this.currentPlayingPlaylist = false;
       this.currentlyPlayingSong = null;
+      this.currentlyPlayingSongIndex = null;
 
       this.youtubePlayer = YoutubePlayerView.getYoutubePlayer();
       this.setMode(modes.none);
@@ -56,6 +57,8 @@ define([
       }
       $(".mode").removeClass("selected_mode");
       $target.toggleClass("selected_mode");
+      console.log("just selected mode");
+      console.log(this.mode);
     },
     
     setMode: function (mode) {
@@ -123,7 +126,9 @@ define([
     },
   
     playNextSong: function() {
-      var playlistLength = this.model.songs.length
+      var playlistLength = this.model.songs.length;
+      console.log("in play next song");
+      console.log(this.mode);
       if (playlistLength > 0) {
         switch (this.mode) {
           case modes.repeatAll:
@@ -145,6 +150,7 @@ define([
             this.youtubePlayer.playSong(newSong)
             break;
           case modes.repeatOne:
+            this.youtubePlayer.playSong(this.currentPlayingSong);
             break;
         }
       }
@@ -152,16 +158,17 @@ define([
   
     playSequentialSong: function(playlistLength) {
       var newSong;
-      if (this.currentlyPlayingSong == null) {
+      if (this.currentlyPlayingSongIndex == null) {
         newSong = this.model.songs.first();
-        this.currentlyPlayingSong = newSong.get('order') - 1;
-      } else if (this.currentlyPlayingSong < playlistLength - 1) {
+        this.currentlyPlayingSongIndex = newSong.get('order') - 1;
+      } else if (this.currentlyPlayingSongIndex < playlistLength - 1) {
         this.currentlyPlayingSong += 1;
-        newSong = this.model.songs.models[this.currentlyPlayingSong]
+        newSong = this.model.songs.models[this.currentlyPlayingSongIndex]
       } else if (this.mode == modes.repeatAll) {
-        this.currentlyPlayingSong = 0;
-        newSong = this.model.songs.models[this.currentlyPlayingSong]
+        this.currentlyPlayingSongIndex = 0;
+        newSong = this.model.songs.models[this.currentlyPlayingSongIndex]
       }
+      this.currentlyPlayingSong = newSong;
       this.youtubePlayer.playSong(newSong);
     },
 

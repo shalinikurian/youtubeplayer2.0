@@ -22,14 +22,12 @@ define([
     },
 
     playSong: function(song) {
-      debugger;
        var songUrl = song.get('song_id');
         if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
           window.onYouTubePlayerAPIReady = function() {
             this.loadPlayer(songUrl);
           };
         } else {
-          console.log("there")
           this.loadPlayer(songUrl);
         }
     },
