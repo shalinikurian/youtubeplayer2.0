@@ -30,7 +30,7 @@ define([
       this.vent.bind("videoEnded", this.onVideoEnd);
       this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
 
-      this.showPlayList();
+      this.render();
       if (this.startFromBeginning) this.playNextSong();
       
     },
@@ -62,26 +62,6 @@ define([
       this.mode = mode
     },
     
-    // Get templates for playlist information. render views.
-    showPlayList: function() {
-      var noOfSongs = this.model.songs.length;
-      var playlistTemplate = (noOfSongs == 0) ? (_.template($('#playlist_info_template_no_songs').html())) : (_.template($('#playlist_info_template').html()));
-      var variables = (noOfSongs == 0) ? {} : {"thumbnail1": this.model.songs.last().get('thumbnail')};
-      this.$el.append(playlistTemplate(variables));
-      // General info.
-      var generalInfoTemplate = _.template($('#playlist_info_template_general').html());
-      variables = {
-        "title":this.model.get('name'),
-        "noOfSongs" : this.model.songs.length ,
-        "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
-      };
-      this.$el.append(generalInfoTemplate(variables));
-      var modesTemplate = _.template($('#playlist_modes_template').html());
-      this.$el.append(modesTemplate);
-      // Add song list.
-      this.addSongList();
-    },
-    
     addSongList: function() {
       var songListTemplate = _.template($('#songs_list').html());
       this.$el.append(songListTemplate());
@@ -100,7 +80,7 @@ define([
         //containment: $("#songs"),
         zIndex: 999,
         stop: function() {
-          this.showPlaylist();
+          this.render();
         }.bind(this), 
         helper: function(evt, elem) {
           return $("<div class='song-draggable'>"+elem.find('.song .song_title').text()+"</div>");
@@ -111,11 +91,31 @@ define([
         }.bind(this)
       });
     },
-  
+
+    render: function() {
+      this.$el.html('');
+      var noOfSongs = this.model.songs.length;
+      var playlistTemplate = (noOfSongs == 0) ? (_.template($('#playlist_info_template_no_songs').html())) : (_.template($('#playlist_info_template').html()));
+      var variables = (noOfSongs == 0) ? {} : {"thumbnail1": this.model.songs.last().get('thumbnail')};
+      this.$el.append(playlistTemplate(variables));
+      // General info.
+      var generalInfoTemplate = _.template($('#playlist_info_template_general').html());
+      variables = {
+        "title":this.model.get('name'),
+        "noOfSongs" : this.model.songs.length ,
+        "duration": (noOfSongs == 0 ) ? '0 s' : this.model.playlistDuration()
+      };
+      this.$el.append(generalInfoTemplate(variables));
+      var modesTemplate = _.template($('#playlist_modes_template').html());
+      this.$el.append(modesTemplate);
+      // Add song list.
+      this.addSongList();
+    },
+
     songDeleted: function(song) {
       if (song == this.currentlyPlayingSong) $("#video_player_container").hide();
       this.model.songs.reorderAfterDelete();
-      this.showPlaylist();
+      this.render();
     },
     
     playParticularSong: function(song) {
