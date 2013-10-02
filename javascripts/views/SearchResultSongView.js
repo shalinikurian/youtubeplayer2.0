@@ -1,10 +1,12 @@
 define([
   'backbone',
+  'eventBus',
   'views/YoutubePlayerView'
-], function(Backbone, YoutubePlayerView){
+], function(Backbone, vent, YoutubePlayerView){
   var SearchResultSongView = Backbone.View.extend({
     // Make search results draggable and initialize view with search result template.
     initialize: function() {
+      this.vent = vent;
       this.$searchResultItem = $(this.el);
       this.$searchResultItem.addClass('search_result_item');
       this.template = _.template($('#search_result_template').html());
@@ -31,6 +33,7 @@ define([
   
     playSong: function() {
       this.youtubePlayer.playSong(this.model)
+      this.vent.trigger("searchViewSongPlaying");
     }
   });
   

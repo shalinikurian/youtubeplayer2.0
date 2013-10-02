@@ -13,10 +13,13 @@ define([
     initialize: function(args) {
       this.vent = vent;
       this.model = args.model;
+      this.currentlyPlaying = false;
       this.playlistsCollection = playlistsCollection.getPlayListCollection();
-      _.bindAll(this, 'remove', 'onSearchStart');
+      _.bindAll(this, 'remove', 'onSearchStart', 'setCurrentlyPlayingPlaylist');
   
       this.vent.bind("searchStarted", this.onSearchStart);
+      this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentlyPlayingPlaylist);
+      this.vent.bind("searchViewSongPlaying", this.setCurrentlyPlayingPlaylist.bind(null));
       this.model.bind('destroy', this.remove);
   
       $(this.el).attr('id', this.model.id);
@@ -39,7 +42,11 @@ define([
       'click .delete' : 'deletePlaylist',
       'click .playlist_name' : 'switchToPlaylist',
     },
-    
+   
+    setCurrentlyPlayingPlaylist : function (playlistId) {
+      if (this.model.get('id') == playlistId) this.currentlyPlaying = true;
+      else this.currentlyPlaying = false;
+    },
     // Delete playlist , unbind events and remove view, reorder playlists after delete.
     deletePlaylist: function(e){
       this.unbind();
@@ -63,11 +70,16 @@ define([
     },
     
     switchToPlaylist: function() {
-      // Hide search results.
+      // Hide search results
       $('#search_results_view').hide();
       //make a playlistContentView
+      var startFromBeginning = true;
+      if (this.currentlyPlaying) {
+        startFromBeginning = false;
+      }
       var playlistContentView = new PlayListContentView({
         'model': this.model,
+        'startFromBeginning' : startFromBeginning
       });
       this.vent.trigger('switchedCurrentPlayingPlaylist', this.model.get('id'));
     }

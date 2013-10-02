@@ -12,8 +12,10 @@ define([
     initialize: function(args) {
       this.$el.empty();
       this.model = args.model;
+      this.startFromBeginning = args.startFromBeginning;
       this.vent = vent;
 
+      
       this.currentPlayingPlaylist = false;
       this.currentlyPlayingSong = null;
       this.currentlyPlayingSongIndex = null;
@@ -29,7 +31,7 @@ define([
       this.vent.bind("switchedCurrentPlayingPlaylist", this.setCurrentPlayingPlaylist);
 
       this.showPlayList();
-      this.playNextSong();
+      if (this.startFromBeginning) this.playNextSong();
       
     },
 
@@ -97,6 +99,9 @@ define([
         //axis: 'y',
         //containment: $("#songs"),
         zIndex: 999,
+        stop: function() {
+          this.showPlaylist();
+        }.bind(this), 
         helper: function(evt, elem) {
           return $("<div class='song-draggable'>"+elem.find('.song .song_title').text()+"</div>");
         }.bind(this),
@@ -111,6 +116,7 @@ define([
       this.model.songs.reorderAfterDelete();
       this.showPlaylist();
       //re render TODO
+      this.render();
     },
     
     playParticularSong: function(song) {
