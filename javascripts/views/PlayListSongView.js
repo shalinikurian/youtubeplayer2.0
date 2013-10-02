@@ -32,7 +32,7 @@ define([
       this.unbind();
       //reorder songs after delete
       this.model.destroy();
-      this.vent.trigger('songDeleted');
+      this.vent.trigger('songDeleted', this.model);
     },
     
     playSong: function(evt) {

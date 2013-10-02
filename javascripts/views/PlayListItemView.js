@@ -30,7 +30,6 @@ define([
         accept: '.search_result_item, .playlist_song',
         hoverClass: "ui-state-active",
         drop: function(event, ui){
-          debugger;
           var song = $(ui.draggable).data("song-model");
           this.model.addSong(song);
           ui.helper.hide();
@@ -49,6 +48,9 @@ define([
     },
     // Delete playlist , unbind events and remove view, reorder playlists after delete.
     deletePlaylist: function(e){
+      if (this.currentlyPlaying) {
+        $("#video_player_container").hide();;
+      }
       this.unbind();
       this.model.collection = this.playlistsCollection; //HACK this.model did not have collection. delete was not working
       this.model.destroy();

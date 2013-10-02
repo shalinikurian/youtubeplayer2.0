@@ -112,15 +112,15 @@ define([
       });
     },
   
-    songDeleted: function() {
+    songDeleted: function(song) {
+      if (song == this.currentlyPlayingSong) $("#video_player_container").hide();
       this.model.songs.reorderAfterDelete();
       this.showPlaylist();
-      //re render TODO
-      this.render();
     },
     
     playParticularSong: function(song) {
       this.currentlyPlayingSongIndex = song.get('order') - 1;
+      this.currentlyPlayingSong = song;
       this.youtubePlayer.playSong(song);
     },
   
