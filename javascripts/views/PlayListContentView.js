@@ -95,6 +95,7 @@ define([
       // Make the songs sortable.
       this.songsContainer.sortable({
         axis: 'y',
+        containment: $("#songs"),
         update: function(e,ui) {
           var songsOrder = $(e.target).sortable('toArray');
           this.model.songs.reorderAfterSorting(songsOrder);
