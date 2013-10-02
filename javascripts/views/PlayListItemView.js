@@ -24,9 +24,10 @@ define([
       this.$template = _.template($('#playlist_template').html());
       
       $(this.el).droppable({
-        accept: '.search_result_item',
+        accept: '.search_result_item, .playlist_song',
         hoverClass: "ui-state-active",
         drop: function(event, ui){
+          debugger;
           var song = $(ui.draggable).data("song-model");
           this.model.addSong(song);
           ui.helper.hide();

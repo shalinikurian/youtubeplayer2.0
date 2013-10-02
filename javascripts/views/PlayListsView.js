@@ -16,6 +16,7 @@ define([
       this.playlistsCollection = playlistsCollection.getPlayListCollection();
       this.$playlists.sortable({
         axis: 'y',
+        connectWith: '#songs',
         helper: "clone"
       });
       this.render();

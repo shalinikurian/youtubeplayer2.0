@@ -94,8 +94,12 @@ define([
       
       // Make the songs sortable.
       this.songsContainer.sortable({
-        axis: 'y',
-        containment: $("#songs"),
+        //axis: 'y',
+        //containment: $("#songs"),
+        zIndex: 999,
+        helper: function(evt, elem) {
+          return $("<div class='song-draggable'>"+elem.find('.song .song_title').text()+"</div>");
+        }.bind(this),
         update: function(e,ui) {
           var songsOrder = $(e.target).sortable('toArray');
           this.model.songs.reorderAfterSorting(songsOrder);

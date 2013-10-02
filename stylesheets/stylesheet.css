@@ -90,7 +90,7 @@ body {
     background-color: #373737;
     margin-left: 5px;
     margin-top: 5px;
-    overflow: auto;
+    /*overflow: auto;*/
     z-index: 2;
 }
 
@@ -221,6 +221,9 @@ body {
     opacity: 0.8;
     z-index: 99;
     padding: 2px;
+    color: black;
+    width: 100px;
+    height: 100px;
 }
 
 #playlist_view {

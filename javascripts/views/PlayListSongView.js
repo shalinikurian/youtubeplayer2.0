@@ -15,12 +15,14 @@ define([
       if (evenRow) $(this.el).addClass('even_row');
       else $(this.el).addClass('odd_row');
       $(this.el).attr('id', this.model.id);
+      $(this.el).addClass('playlist_song');
     },
     
     render: function() {
       var songTemplate = eachSongTemplate = _.template($('#playlist_song').html());
       var songVariables = {"track": this.model.get('title'), "duration":this.model.get('duration'), "thumbnail": this.model.get('thumbnail')};
       $(this.el).html(eachSongTemplate(songVariables));
+      $(this.el).data("song-model", this.model);
       return this;
     },
   
