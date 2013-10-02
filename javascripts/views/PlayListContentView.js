@@ -131,10 +131,6 @@ define([
       console.log(this.mode);
       if (playlistLength > 0) {
         switch (this.mode) {
-          case modes.repeatAll:
-          case modes.none:
-            this.playSequentialSong(playlistLength);
-            break;
           case modes.shuffle:
             var rand = 0;
             // Pick a random song that is not equal to the current one. If there is only one song in the playlist,
@@ -151,6 +147,10 @@ define([
             break;
           case modes.repeatOne:
             this.youtubePlayer.playSong(this.currentPlayingSong);
+            break;
+          case modes.repeatAll:
+          case modes.none:
+            this.playSequentialSong(playlistLength);
             break;
         }
       }
