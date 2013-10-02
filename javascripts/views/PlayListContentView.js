@@ -45,20 +45,15 @@ define([
     changeMode : function(evt){
       var $target = $(evt.target);
       var mode = $target.data("mode");
+      $(".mode").removeClass("selected_mode");
       if (this.mode == mode) {
         this.setMode(modes.none);
       }
       else {
-        switch(mode) {
-          case "shuffle": this.setMode(modes.shuffle);
-          case "repeat_one": this.setMode(modes.repeatOne);
-          case "repeat_all": this.setMode(modes.repeatAll);
-        }
+        this.setMode(mode);
+        $target.toggleClass("selected_mode");
       }
-      $(".mode").removeClass("selected_mode");
-      $target.toggleClass("selected_mode");
-      console.log("just selected mode");
-      console.log(this.mode);
+    
     },
     
     setMode: function (mode) {
@@ -114,7 +109,7 @@ define([
     },
     
     playParticularSong: function(song) {
-      this.currentlyPlayingSong = song.get('order') - 1;
+      this.currentlyPlayingSongIndex = song.get('order') - 1;
       this.youtubePlayer.playSong(song);
     },
   
@@ -139,14 +134,15 @@ define([
               do {
               rand = utils.generateRandomNumber(0, playlistLength - 1);
               console.log(rand)
-              } while (rand === this.currentlyPlayingSong);
+              } while (rand === this.currentlyPlayingSongIndex);
             }
-            this.currentlyPlayingSong = rand;
-            var newSong = this.model.songs.models[this.currentlyPlayingSong]
+            this.currentlyPlayingSongIndex = rand;
+            var newSong = this.model.songs.models[this.currentlyPlayingSongIndex]
+            this.currentlyPlayingSong = newSong;
             this.youtubePlayer.playSong(newSong)
             break;
           case modes.repeatOne:
-            this.youtubePlayer.playSong(this.currentPlayingSong);
+            this.youtubePlayer.playSong(this.currentlyPlayingSong);
             break;
           case modes.repeatAll:
           case modes.none:
@@ -162,7 +158,7 @@ define([
         newSong = this.model.songs.first();
         this.currentlyPlayingSongIndex = newSong.get('order') - 1;
       } else if (this.currentlyPlayingSongIndex < playlistLength - 1) {
-        this.currentlyPlayingSong += 1;
+        this.currentlyPlayingSongIndex += 1;
         newSong = this.model.songs.models[this.currentlyPlayingSongIndex]
       } else if (this.mode == modes.repeatAll) {
         this.currentlyPlayingSongIndex = 0;
